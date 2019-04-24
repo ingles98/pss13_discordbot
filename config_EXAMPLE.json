@@ -1,0 +1,5 @@
+{
+	"token": "TOKEN",
+	"db": "PATH\\TO\\DB",
+	"generalChannelId": "GENERAL_CHANNEL_ID"
+}
