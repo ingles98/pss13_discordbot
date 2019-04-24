@@ -1,0 +1,14 @@
+{
+	"name": "pss13-bot",
+	"version": "0.0.1",
+	"description": "BETA",
+	"main": "bot.js",
+	"author": "Stigma aka ingles98",
+	"dependencies": {
+		"bluebird": "^3.5.4",
+		"discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+		"mysql": "^2.17.1",
+		"sqlite": "^3.0.3",
+		"winston": "^3.2.1"
+	}
+}
