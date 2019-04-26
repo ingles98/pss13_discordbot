@@ -33,7 +33,7 @@ class AppDAO {
 
 	createTable() {
 		const sql = `
-		CREATE TABLE IF NOT EXISTS discord_hook (
+		CREATE TABLE IF NOT EXISTS `+config.queueTable+` (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		msg TEXT)`
 		return this.run(sql)
@@ -53,7 +53,7 @@ class AppDAO {
 	}
 
 	get_messages(channel_id) {
-		var sql = `SELECT * FROM discord_hook`
+		var sql = `SELECT * FROM `+config.queueTable
 		var params = []
 		
 		this.db.all(sql, params, (err, rows) => {
@@ -71,9 +71,9 @@ class AppDAO {
 	}
 
 	clear_message_from_db(msg) {
-		var sql = `DELETE FROM discord_hook WHERE msg =`+msg
+		var sql = `DELETE FROM `+config.queueTable+` WHERE msg =`+msg
 		var params = []
-		this.db.run(`DELETE FROM discord_hook WHERE msg=?`, msg, function(err) {
+		this.db.run(`DELETE FROM `+config.queueTable+` WHERE msg=?`, msg, function(err) {
 			if (err) {
 				return console.error(err.message);
 			}
@@ -81,26 +81,33 @@ class AppDAO {
 	}
 
 	message(target, msg) {
-		//target = "178524531575619584"
+		//Handles all sorts of messaging
+		this.clear_message_from_db(msg)
 		var source = null
 		var msg_array = msg.split(" ")
 		var cmd = msg_array[0]
 		var parsed_msg = msg
 		switch (cmd){
 			case "MAIL":
+				
 				target = msg_array[1]
 				source = msg_array[2]
+
+				if (! bot.servers[config.serverId]["members"].hasOwnProperty(target) ){
+					console.log("WARNING - Attempted to MAIL non existing target user ID " + target)
+					return false
+				}
+				
 				msg_array.splice(0,3)
 				parsed_msg = "EMAIL RECEIVED - "+ "From "+ source +" - "+ msg_array.join(" ")
 				break;
 			default:
 				//
 		}
-		bot.sendMessage({
+		return bot.sendMessage({
 			to: target,
 			message: parsed_msg
 		});
-		this.clear_message_from_db(msg)
 	}
 }
 
@@ -156,7 +163,31 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 				});
 			case 'hookdb':
 				sqlmngr.get_messages(channelID)
-            break;
+			break;
+			case 'validatelink':
+				var ckey = arg[1]
+				if (!ckey){
+					bot.sendMessage({
+						to: channelID,
+						message: 'You need to enter your BYOND username. Eg.: \"!validatelink stiigma\"'
+					});
+				} else {
+					var sql = 
+					sqlmngr.db.all(sql, params, (err, rows) => {
+						if (err) {
+							console.log('Error running sql: ' + sql)
+							console.log(err)
+						} else {
+							//resolve(rows)
+							rows.forEach((row) => {
+								console.log(row.msg);
+								this.message(channel_id, row.msg)
+							});
+						}
+					})
+				}
+
+				break;
             // Just add any case commands if you want to..
          }
      }
