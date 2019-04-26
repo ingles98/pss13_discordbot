@@ -1,5 +1,7 @@
 {
 	"token": "TOKEN",
 	"db": "PATH\\TO\\DB",
+	"queueTable": "DB_QUEUE_TBL",
+	"serverId": "SERVER_ID",
 	"generalChannelId": "GENERAL_CHANNEL_ID"
 }
