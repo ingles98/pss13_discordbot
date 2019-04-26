@@ -80,10 +80,25 @@ class AppDAO {
 		})
 	}
 
-	message(channelID, msg) {
+	message(target, msg) {
+		//target = "178524531575619584"
+		var source = null
+		var msg_array = msg.split(" ")
+		var cmd = msg_array[0]
+		var parsed_msg = msg
+		switch (cmd){
+			case "MAIL":
+				target = msg_array[1]
+				source = msg_array[2]
+				msg_array.splice(0,3)
+				parsed_msg = "EMAIL RECEIVED - "+ "From "+ source +" - "+ msg_array.join(" ")
+				break;
+			default:
+				//
+		}
 		bot.sendMessage({
-			to: channelID,
-			message: msg
+			to: target,
+			message: parsed_msg
 		});
 		this.clear_message_from_db(msg)
 	}
