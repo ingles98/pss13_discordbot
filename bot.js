@@ -110,14 +110,14 @@ class AppDAO {
 				target = msg_array[1].split("\"").join("")
 				source = msg_array[2]
 				var target_character_name = msg_array[3]
-
+				var message_title = msg_array[4]
+				msg_array.splice(0,5)
+				var message = msg_array.join(" ").split("[editorbr]").join("\n")
 				if (! bot.servers[config.serverId]["members"].hasOwnProperty(target) ){
 					console.log("WARNING - Attempted to MAIL non existing target user ID " + target)
 					return false
 				}
-				
-				msg_array.splice(0,4)
-				parsed_msg = "EMAIL RECEIVED - "+ "From: "+ source +" To: "+target_character_name+"\n\n"+ msg_array.join(" ").split("[editorbr]").join("\n")
+				parsed_msg = "You've got Mail!"+ "\n\nFrom: `"+ source +"`\nTo: \`"+target_character_name+"\`\nTitle: **\`"+message_title+"\`**\n\n```"+ message +"```"
 				break;
 			default:
 				//
