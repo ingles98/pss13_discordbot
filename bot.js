@@ -19,24 +19,41 @@ class AppDAO {
 
 	run(sql, params = []) {
 		return new Promise((resolve, reject) => {
-		this.db.run(sql, params, function (err) {
-			if (err) {
-			console.log('Error running sql ' + sql)
-			console.log(err)
-			reject(err)
-			} else {
-			resolve({ id: this.lastID })
-			}
-		})
+			this.db.run(sql, params, function (err) {
+				if (err) {
+				console.log('Error running sql ' + sql)
+				console.log(err)
+				reject(err)
+				} else {
+				resolve({ id: this.lastID })
+				}
+			})
 		})
 	}
 
-	createTable() {
+	createTable_queue() {
 		const sql = `
 		CREATE TABLE IF NOT EXISTS `+config.queueTable+` (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		msg TEXT)`
 		return this.run(sql)
+	}
+	createTable_users() {
+		const sql = `
+		CREATE TABLE IF NOT EXISTS `+config.usersTable+` (
+			userID STRING  PRIMARY KEY ON CONFLICT ROLLBACK
+						   UNIQUE ON CONFLICT ROLLBACK
+						   NOT NULL ON CONFLICT ROLLBACK,
+			ckey   STRING  UNIQUE ON CONFLICT ROLLBACK
+						   NOT NULL ON CONFLICT ROLLBACK,
+			valid  BOOLEAN DEFAULT (false) 
+		);		
+		`
+		return this.run(sql)
+	}
+
+	createTable() {
+		this.createTable_queue();
+		this.createTable_users();
 	}
 
 	get(sql, params = []) {
@@ -84,22 +101,23 @@ class AppDAO {
 		//Handles all sorts of messaging
 		this.clear_message_from_db(msg)
 		var source = null
-		var msg_array = msg.split(" ")
+		var msg_array = msg.split("|")
 		var cmd = msg_array[0]
 		var parsed_msg = msg
 		switch (cmd){
 			case "MAIL":
 				
-				target = msg_array[1]
+				target = msg_array[1].split("\"").join("")
 				source = msg_array[2]
+				var target_character_name = msg_array[3]
 
 				if (! bot.servers[config.serverId]["members"].hasOwnProperty(target) ){
 					console.log("WARNING - Attempted to MAIL non existing target user ID " + target)
 					return false
 				}
 				
-				msg_array.splice(0,3)
-				parsed_msg = "EMAIL RECEIVED - "+ "From "+ source +" - "+ msg_array.join(" ")
+				msg_array.splice(0,4)
+				parsed_msg = "EMAIL RECEIVED - "+ "From: "+ source +" To: "+target_character_name+"\n\n"+ msg_array.join(" ").split("[editorbr]").join("\n")
 				break;
 			default:
 				//
@@ -161,28 +179,80 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     to: channelID,
                     message: 'Pong!'
 				});
+				break;
 			case 'hookdb':
-				sqlmngr.get_messages(channelID)
-			break;
+				const sql = `SELECT * FROM `+config.usersTable
+				sqlmngr.db.all(sql, params =[], (err, rows) => {
+					if (err) {
+						console.log('validatelink - Error running sql: ' + sql)
+						console.log(err)
+						bot.sendMessage({
+							to: userID,
+							message: err_usr_msg
+						});
+					} else {
+						//console.log('validatelink - Error running sql: ' + sql)
+						for (var key in rows) {
+							console.log(rows[key])
+						}
+					}
+				})
+				break;
 			case 'validatelink':
-				var ckey = arg[1]
+				var ckey = args[0]
 				if (!ckey){
 					bot.sendMessage({
-						to: channelID,
-						message: 'You need to enter your BYOND username. Eg.: \"!validatelink stiigma\"'
+						to: userID,
+						message: 'You need to enter your BYOND username. Eg.: \"!validatelink stiigma\" - ' + ckey
 					});
 				} else {
-					var sql = 
-					sqlmngr.db.all(sql, params, (err, rows) => {
+					const err_usr_msg = `Sorry, but I couldn't process your Discord to Persistence link validation.
+					\nHave you already linked your acount in-game? Or perhaps \`you're not typing your BYOND username (aka ckey) correctly!\`
+					\nTo do so, simply join the server, press the \`"Special Verbs"\` tab and \`"Link Discord Account"\`.`+
+					`\nYou'll just need to enter DEVELOPER MODE on discord to be able to grab your user ID. If it is enabled,`+
+					`just right-click on your Username and pick "Copy ID" on the context menu, then paste it on the input window that`+
+					`had popped in-game.
+					\nAfterwards, you may validate your linkage here.`
+					const sql = `SELECT * FROM `+config.usersTable+` WHERE userID = '`+'\"'+userID+'\"'+`' AND ckey = "`+ckey+`"`
+					sqlmngr.db.get(sql, params=[], (err, result) => {
 						if (err) {
-							console.log('Error running sql: ' + sql)
+							console.log('validatelink - Error running sql: ' + sql)
 							console.log(err)
-						} else {
-							//resolve(rows)
-							rows.forEach((row) => {
-								console.log(row.msg);
-								this.message(channel_id, row.msg)
+							bot.sendMessage({
+								to: userID,
+								message: err_usr_msg
 							});
+						} else {
+							if (result){
+								//console.log("USER ID EXISTS - "+userID+" rs: "+result)
+								var status_msg = "Hooray! Your account has been linked!"
+								if (result.valid == 0){
+									const sql = `UPDATE `+config.usersTable+` SET valid = 1 WHERE userID = '`+'\"'+userID+'\"'+`'`
+									sqlmngr.db.run(sql, params = [], function (err) {
+										if (err) {
+											console.log('Error running sql ' + sql)
+											console.log(err)
+											status_msg = "There was a problem processing your validation request. Please, contact a developer."
+										} else {
+
+										}
+									})
+								} else {
+									status_msg = `My apologies, but this Discord account is already linked! You may unlink it using the following methods:
+									\n\t - \`!devalidatelink\`
+									\n\t - \`In-game > "Special Verbs" > "Devalidate Discord Link"\``
+								}
+								bot.sendMessage({
+									to: userID,
+									message: status_msg
+								});
+							} else {
+								console.log('NO RESULT' + sql)
+								bot.sendMessage({
+									to: userID,
+									message: err_usr_msg
+								});
+							}
 						}
 					})
 				}
