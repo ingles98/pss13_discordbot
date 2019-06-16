@@ -45,7 +45,7 @@ class AppDAO {
 						   NOT NULL ON CONFLICT ROLLBACK,
 			ckey   STRING  UNIQUE ON CONFLICT ROLLBACK
 						   NOT NULL ON CONFLICT ROLLBACK,
-			valid  BOOLEAN DEFAULT (false) 
+			valid  BOOLEAN DEFAULT (0) 
 		);		
 		`
 		return this.run(sql)
