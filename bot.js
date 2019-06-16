@@ -112,7 +112,7 @@ class AppDAO {
 				var target_character_name = msg_array[3]
 				var message_title = msg_array[4]
 				msg_array.splice(0,5)
-				var message = msg_array.join(" ").split("[editorbr]").join("\n")
+				var message = msg_array.join(" ").split("[editorbr]").join("\n").split("[br]").join("\n")
 				if (! bot.servers[config.serverId]["members"].hasOwnProperty(target) ){
 					console.log("WARNING - Attempted to MAIL non existing target user ID " + target)
 					return false
