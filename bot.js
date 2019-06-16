@@ -174,30 +174,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         args = args.splice(1);
         switch(cmd) {
             // !ping
-            case 'ping':
-                bot.sendMessage({
-                    to: channelID,
-                    message: 'Pong!'
-				});
-				break;
-			case 'hookdb':
-				const sql = `SELECT * FROM `+config.usersTable
-				sqlmngr.db.all(sql, params =[], (err, rows) => {
-					if (err) {
-						console.log('validatelink - Error running sql: ' + sql)
-						console.log(err)
-						bot.sendMessage({
-							to: userID,
-							message: err_usr_msg
-						});
-					} else {
-						//console.log('validatelink - Error running sql: ' + sql)
-						for (var key in rows) {
-							console.log(rows[key])
-						}
-					}
-				})
-				break;
 			case 'validatelink':
 				var ckey = args[0]
 				if (!ckey){
@@ -256,16 +232,13 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 						}
 					})
 				}
-
 				break;
-            // Just add any case commands if you want to..
          }
      }
 });
 
 function Main (){
 	if (generalChannel != null && bot != null && bot_ready){
-		//generalChannel.send("Hello, world!")
 		sqlmngr.get_messages(generalChannel.id)
 	}
 	setTimeout(() => {
