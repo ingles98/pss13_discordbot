@@ -192,7 +192,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 					`just right-click on your Username and pick "Copy ID" on the context menu, then paste it on the input window that`+
 					`had popped in-game.
 					\nAfterwards, you may validate your linkage here.`
-					const sql = `SELECT * FROM `+config.usersTable+` WHERE userID = ? AND ckey = ?`
+					let sql = "SELECT * FROM "+config.usersTable+" WHERE userID = ? AND ckey = ?"
 					sqlmngr.db.get(sql, [`'`+'\"'+userID+'\"'+`'`, `"`+ckey+`"`], (err, result) => {
 						if (err) {
 							console.log('validatelink - Error running sql: ' + sql)
