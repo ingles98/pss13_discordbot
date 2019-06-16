@@ -119,6 +119,9 @@ class AppDAO {
 				}
 				parsed_msg = "You've got Mail!"+ "\n\nFrom: `"+ source +"`\nTo: \`"+target_character_name+"\`\nTitle: **\`"+message_title+"\`**\n\n```"+ message +"```"
 				break;
+			case "BROADCAST":
+				parsed_msg = msg_array[1]
+				break;
 			default:
 				//
 		}
