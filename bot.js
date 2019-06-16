@@ -179,7 +179,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 				if (!ckey){
 					bot.sendMessage({
 						to: userID,
-						message: 'You need to enter your BYOND username. Eg.: \"!validatelink stiigma\" - ' + ckey
+						message: 'You need to enter your BYOND username. Eg.: \"!validatelink stiigma\"'
 					});
 				} else {
 					const err_usr_msg = `Sorry, but I couldn't process your Discord to Persistence link validation.
