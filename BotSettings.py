@@ -11,8 +11,8 @@ insufficient. Use the same seperator as in the game's code:
 
 (code/modules/discord_persistence/_hook.dm)
 """
-
 queue_command_arguments_sep = "[[sep]]"
+
 main_loop_timer = 2  # Seconds
 command_prefix = "!"
 token = 'NTg5ODM0NzkxNzU1NzEwNTA2.XQZe-A.h5JV5bB5UbqIxCSiwXeE0eX3uok'
