@@ -1,8 +1,10 @@
 import time
+import asyncio
 import discord
 import traceback
 from discord.ext import commands
 import BotSettings
+from threading import Thread
 
 bot = commands.Bot(command_prefix=BotSettings.command_prefix)
 
@@ -17,11 +19,11 @@ for extension in extensions:
 		print(e)
 		traceback.print_exc()
 
-def MainLoop():
+async def MainLoop():
 	while True:
-		BotSettings.DB.get_messages()
-		print("endtick")
-		time.sleep(BotSettings.main_loop_timer)
+		messages = BotSettings.DB.get_messages()
+		await BotSettings.bot_actions.process_messages(messages)
+		await asyncio.sleep(BotSettngs.main_loop_timer)
 
 @bot.event
 async def on_ready():
@@ -29,6 +31,7 @@ async def on_ready():
 	print(bot.user.name)
 	print(bot.user.id)
 	print('------')
-	MainLoop()
+	BotSettings.Setup(bot)
+	bot.loop.create_task(MainLoop())
 
 bot.run(BotSettings.token, bot=True, reconnect=True)
