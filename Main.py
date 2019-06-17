@@ -6,7 +6,8 @@ import BotSettings
 bot = commands.Bot(command_prefix=BotSettings.command_prefix)
 
 extensions = [
-    'cogs.debug'
+    'cogs.debug',
+    'cogs.linkage_manager'
 ]
 
 for extension in extensions:

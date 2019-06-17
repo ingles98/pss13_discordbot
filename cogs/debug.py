@@ -23,4 +23,4 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
 
 
 def setup(bot):
-        bot.add_cog(DebugCommands(bot))
+    bot.add_cog(DebugCommands(bot))
