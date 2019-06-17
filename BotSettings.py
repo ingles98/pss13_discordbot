@@ -1,5 +1,5 @@
 import json
-from BotInternalClasses import DatabaseDAO
+from InternalClasses.DatabaseDAO import DatabaseDAO
 
 
 main_loop_timer = 5 # Seconds

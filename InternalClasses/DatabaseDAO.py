@@ -2,6 +2,9 @@ import sqlite3
 from sqlite3 import Error
 
 class DatabaseDAO:
+	"""
+	This class is responsible for parsing data from the database.
+	"""
 	db_path = None
 	db_connection = None
 	usersTable = None
