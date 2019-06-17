@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import BotSettings
 
 class DatabaseDAO:
 	"""
@@ -72,9 +73,6 @@ class DatabaseDAO:
 		except Error as e:
 			print("Error fetching data from queue tbl %s - %s"% (sql, e))
 			return False
-		# Process the queue
-		for row in result:
-			self.__process_message(row)
 		# Delete the queue
 		sql = "DELETE FROM {};".format(self.queueTable)
 		cur = self.db_connection.cursor()
@@ -84,6 +82,4 @@ class DatabaseDAO:
 		except Error as e:
 			print("Error deleting data from queue tbl %s - %s"% (sql, e))
 			return False
-
-	def __process_message(self, data):
-		print(data["msg"])
+		return result
