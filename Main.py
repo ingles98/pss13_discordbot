@@ -32,7 +32,7 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
-    BotSettings.Setup(bot)
+    BotSettings.setup_bot(bot)
     bot.loop.create_task(main_loop())
 
 bot.run(BotSettings.token, bot=True, reconnect=True)

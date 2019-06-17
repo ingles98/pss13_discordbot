@@ -3,6 +3,7 @@ import discord
 from InternalClasses.DatabaseDAO import DatabaseDAO
 from InternalClasses.BotActions import BotActions
 from discord.ext.commands import Bot
+from os import path
 
 """
 The seperator between arguments inside a string because spaces could be
@@ -21,20 +22,33 @@ usersTable = ""
 serverId = 0
 generalChannelId = 0
 
+errmsg_noconfig = """
+----------
+CONFIG FILE 'config.json' NOT FOUND!
+REMEMBER TO COPY OVER 'config.json.example' TO 'config.json'
+EXITING!
+----------
+"""
+
 DB: DatabaseDAO = None
 bot_actions: BotActions = None
 bot_ref: Bot = None
 bot_general_channel_ref: discord.TextChannel = None
 
 
-with open('config.json') as json_file:
-    data = json.load(json_file)
-    token = data["token"]
-    db_path = data["db"]
-    queueTable = data["queueTable"]
-    usersTable = data["usersTable"]
-    serverId = int(data["serverId"])
-    generalChannelId = int(data["generalChannelId"])
+if path.exists('config.json'):
+    with open('config.json') as json_file:
+        data = json.load(json_file)
+        token = data["token"]
+        db_path = data["db"]
+        queueTable = data["queueTable"]
+        usersTable = data["usersTable"]
+        serverId = int(data["serverId"])
+        generalChannelId = int(data["generalChannelId"])
+
+else:
+    print(errmsg_noconfig)
+    quit()
 
 
 def setup_bot(bot: Bot):
