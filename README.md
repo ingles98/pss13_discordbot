@@ -1,16 +1,30 @@
-# pss13_discordbot
+## Persistent SS13 Discord Bot
 
-Needs Node.js.
+A Discord bot written in Python. It handles communications between Discord and the SS13 server.
 
-Before using:
- - Install the dependecies by opening a shell at the source directory and using the command "npm install".
- - Set up a config.json based on config_EXAMPLE.json with your settings. 
- - To turn on the bot, open shell at source directory and use the command "node bot.js".
+### Installation
+```
+git clone https://github.com/ingles98/pss13_discordbot    # clone the repo.
+cd pss13_discordbot                                       # cd into the repo.
+python3 -m venv venv                                      # (optional) make a virtual environment.
+pip install -r requirements.txt                           # install requirements.
+```
 
+### Usage
+```
+cp config.json.example config.json                        # copy example config over.
+python3 Main.py                                           # run the bot.
+```
 
-This bot is purely made for Persistence SS13 official server and may not be supported in any other servers. It is purely tied to PSS13's discord_hook module.
-Most things should probably be very hardcoded to work on PSS13's official discord server AND game server.
-
-# LICENSE
-
-The bot's source code is licensed under AGPL v3. 
+### Configuration
+All configuration is handled through config.json. This file is required to run the bot.
+```
+{
+"token":                                                  # your bot token.
+"db":                                                     # the absolute or relative path to the sqlite db.
+"queueTable":                                             # name of the queue table.
+"usersTable":                                             # name of the users table.
+"serverId":                                               # discord server ID.
+"generalChannelId":                                       # ID of the channel where the bot sends it's announcements.
+}
+```
