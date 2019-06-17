@@ -21,6 +21,6 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             )
             self._last_member = member
 
-    @commands.command()
-    def load_settings(bot):
+
+def setup(bot):
         bot.add_cog(DebugCommands(bot))
