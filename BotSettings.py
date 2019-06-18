@@ -66,3 +66,4 @@ def setup_bot(bot: Bot):
 
     # Setup general channel discord object reference
     global bot_general_channel_ref
+    bot_general_channel_ref = bot.get_channel(generalChannelId)
