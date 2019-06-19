@@ -15,14 +15,16 @@ queue_command_arguments_sep = "[[sep]]"
 
 main_loop_timer = 2  # Seconds
 command_prefix = "!"
-token = 'NTg5ODM0NzkxNzU1NzEwNTA2.XQZe-A.h5JV5bB5UbqIxCSiwXeE0eX3uok'
-db_path = ""
-queueTable = ""
-usersTable = ""
+token = str()
+db_path = str()
+queueTable = str()
+usersTable = str()
 serverId = 0
 generalChannelId = 0
+COMMANDS_WHITELIST = list() # A whiteLIST for commands that require it. Currently only the debug Cog commands should require it.
+                            # Can be user ID's (INT) or server roles (STR)
 
-errmsg_noconfig = """
+MESSAGE_CONFIG_NOT_FOUND = """
 ----------
 CONFIG FILE 'config.json' NOT FOUND!
 REMEMBER TO COPY OVER 'config.json.example' TO 'config.json'
@@ -45,11 +47,23 @@ if path.exists('config.json'):
         usersTable = data["usersTable"]
         serverId = int(data["serverId"])
         generalChannelId = int(data["generalChannelId"])
-
+        if "whitelist" in data:
+            COMMANDS_WHITELIST = data["whitelist"]
 else:
-    print(errmsg_noconfig)
+    print(MESSAGE_CONFIG_NOT_FOUND)
     quit()
 
+def is_user_whitelisted(ctx):
+        # Check if the user ID is in the whitelist
+        if ctx.author.id in COMMANDS_WHITELIST:
+            return True
+        # Check if the context is of a server(guild) and if so, check if the member has whitelisted roles.
+        if ctx.guild:
+            member = ctx.guild.get_member(ctx.author.id)
+            for role in member.roles:
+                if role.name in COMMANDS_WHITELIST:
+                    return True
+        return False
 
 def setup_bot(bot: Bot):
     # Save reference to the Bot

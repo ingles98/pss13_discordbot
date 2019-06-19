@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 import BotSettings
+import os
 
 class DatabaseDAO:
     """
@@ -12,7 +13,9 @@ class DatabaseDAO:
     queueTable = None
 
     def __init__(self, db_path, usersTable, queueTable):
-        self.db_path = db_path
+        self.db_path = os.path.abspath(db_path)
+        if not os.path.exists( os.path.dirname(self.db_path) ):
+            os.makedirs(os.path.dirname(self.db_path))
         self.usersTable = usersTable
         self.queueTable = queueTable
         self.__setup_connection()
@@ -102,6 +105,18 @@ class DatabaseDAO:
             result = cur.fetchone()
         except Error as e:
             print("Error fetching user data from users tbl %s - %s"% (sql, e))
+            return None
+        return result
+
+    def get_all_users(self):
+        sql = """SELECT * FROM {}""".format(self.usersTable)
+        cur:sqlite3.Cursor = self.db_connection.cursor()
+        result = None
+        try:
+            cur.execute(sql)
+            result = cur.fetchall()
+        except Error as e:
+            print("Error get_all_users %s - %s"% (sql, e))
             return None
         return result
 
