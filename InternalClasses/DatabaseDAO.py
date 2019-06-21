@@ -34,10 +34,10 @@ class DatabaseDAO:
         # Users table SQL
         users_tbl_sql = """
             CREATE TABLE IF NOT EXISTS {} (
-                userID STRING  PRIMARY KEY ON CONFLICT ROLLBACK
+                userID TEXT  PRIMARY KEY ON CONFLICT ROLLBACK
                             UNIQUE ON CONFLICT ROLLBACK
                             NOT NULL ON CONFLICT ROLLBACK,
-                ckey   STRING  UNIQUE ON CONFLICT ROLLBACK
+                ckey   TEXT  UNIQUE ON CONFLICT ROLLBACK
                             NOT NULL ON CONFLICT ROLLBACK,
                 valid  BOOLEAN DEFAULT (0) 
             );
@@ -46,8 +46,8 @@ class DatabaseDAO:
         # Queue table SQL
         queue_tbl_sql = """
             CREATE TABLE IF NOT EXISTS {} (
-                command           STRING,
-                command_arguments STRING,
+                command           TEXT,
+                command_arguments TEXT,
                 msg               TEXT
             );
         """.format(self.queueTable)
@@ -67,16 +67,9 @@ class DatabaseDAO:
             print("Error creating database table %s - %s"% (tbl_sql, e))
 
     def get_messages(self):
-        sql = "SELECT * FROM {};".format(self.queueTable)
-        cur = self.db_connection.cursor()
-        result = None
-        # Run the SQL code
-        try:
-            cur.execute(sql)
-            result = cur.fetchall()
-        except Error as e:
-            print("Error fetching data from queue tbl %s - %s"% (sql, e))
-            return False
+        result = self.get_queue()
+        if not result:
+            return None
         # Delete the queue
         sql = "DELETE FROM {};".format(self.queueTable)
         cur = self.db_connection.cursor()
@@ -85,7 +78,7 @@ class DatabaseDAO:
             self.db_connection.commit()
         except Error as e:
             print("Error deleting data from queue tbl %s - %s"% (sql, e))
-            return False
+            return None
         return result
 
     def get_user_data(self, userid, ckey=None):
@@ -119,6 +112,16 @@ class DatabaseDAO:
             print("Error get_all_users %s - %s"% (sql, e))
             return None
         return result
+
+    def get_queue(self):
+        sql = "SELECT * FROM {};".format(self.queueTable)
+        cur = self.db_connection.cursor()
+        try:
+            cur.execute(sql)
+            return cur.fetchall()
+        except Error as e:
+            print("Error fetching data from queue tbl %s - %s"% (sql, e))
+            return False
 
     def validate_link(self, userid):
         sql = """UPDATE {} SET valid = 1 WHERE userID = ? ;""".format(self.usersTable)

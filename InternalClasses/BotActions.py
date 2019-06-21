@@ -20,6 +20,8 @@ class BotActions:
         Returns:
             None
         """
+        if not messages:
+            return
         for message in messages:
             print(" -- BotActions - Processing message: {}".format(dict(message)))
             cmd = message["command"]

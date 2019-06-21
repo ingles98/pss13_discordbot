@@ -30,5 +30,14 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             users_parsed += str(dict(user)) +"\n"
         await ctx.author.send("Users table: \n{}".format(users_parsed) )
 
+    @commands.command()
+    @commands.check(BotSettings.is_user_whitelisted)
+    async def db_get_queue(self, ctx, *, member: discord.Member = None):
+        queue = BotSettings.DB.get_queue()
+        queue_parsed = str()
+        for msg in queue:
+            queue_parsed += str(dict(msg)) +"\n"
+        await ctx.author.send("Queue table: \n{}".format(queue_parsed) )
+
 def setup(bot):
     bot.add_cog(DebugCommands(bot))
