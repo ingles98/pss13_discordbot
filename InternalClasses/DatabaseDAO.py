@@ -8,15 +8,15 @@ class DatabaseDAO:
     """
     db_path = None
     db_connection = None
-    usersTable = None
-    queueTable = None
+    users_table = None
+    queue_table = None
 
-    def __init__(self, db_path, usersTable, queueTable):
+    def __init__(self, db_path, users_table, queue_table):
         self.db_path = os.path.abspath(db_path)
         if not os.path.exists( os.path.dirname(self.db_path) ):
             os.makedirs(os.path.dirname(self.db_path))
-        self.usersTable = usersTable
-        self.queueTable = queueTable
+        self.users_table = users_table
+        self.queue_table = queue_table
         self.__setup_connection()
         self.__setup_tables()
 
@@ -40,7 +40,7 @@ class DatabaseDAO:
                             NOT NULL ON CONFLICT ROLLBACK,
                 valid  BOOLEAN DEFAULT (0) 
             );
-        """.format(self.usersTable)
+        """.format(self.users_table)
 
         # Queue table SQL
         queue_tbl_sql = """
@@ -49,7 +49,7 @@ class DatabaseDAO:
                 command_arguments TEXT,
                 msg               TEXT
             );
-        """.format(self.queueTable)
+        """.format(self.queue_table)
 
         # Execute
         self.__create_table(users_tbl_sql)
@@ -70,7 +70,7 @@ class DatabaseDAO:
         if not result:
             return None
         # Delete the queue
-        sql = "DELETE FROM {};".format(self.queueTable)
+        sql = "DELETE FROM {};".format(self.queue_table)
         cur = self.db_connection.cursor()
         try:
             cur.execute(sql)
@@ -80,20 +80,25 @@ class DatabaseDAO:
             return None
         return result
 
-    def get_user_data(self, userid, ckey=None):
-        if ckey:
+    def get_user_data(self, userid=None, ckey=None):
+        if not userid and not ckey:
+            return None
+        params = tuple()
+        if userid and ckey:
             sql = """SELECT * FROM {} WHERE userID = ? AND ckey = ? ;"""
-        else:
+            params = ( str(userid), ckey, )
+        elif userid:
             sql = """SELECT * FROM {} WHERE userID = ? ;"""
-        sql = sql.format(self.usersTable)
+            params = ( str(userid), )
+        elif ckey:
+            sql = """SELECT * FROM {} WHERE ckey = ? ;"""
+            params = ( str(ckey), )
+        sql = sql.format(self.users_table)
 
         cur:sqlite3.Cursor = self.db_connection.cursor()
         result = None
         try:
-            if ckey:
-                cur.execute(sql, ( str(userid), ckey, ) )
-            else:
-                cur.execute(sql, ( str(userid), ) )
+            cur.execute(sql, params )
             result = cur.fetchone()
         except Error as e:
             print("Error fetching user data from users tbl %s - %s"% (sql, e))
@@ -101,7 +106,7 @@ class DatabaseDAO:
         return result
 
     def get_all_users(self):
-        sql = """SELECT * FROM {}""".format(self.usersTable)
+        sql = """SELECT * FROM {}""".format(self.users_table)
         cur:sqlite3.Cursor = self.db_connection.cursor()
         result = None
         try:
@@ -113,7 +118,7 @@ class DatabaseDAO:
         return result
 
     def get_queue(self):
-        sql = "SELECT * FROM {};".format(self.queueTable)
+        sql = "SELECT * FROM {};".format(self.queue_table)
         cur = self.db_connection.cursor()
         try:
             cur.execute(sql)
@@ -123,7 +128,7 @@ class DatabaseDAO:
             return False
 
     def validate_link(self, userid):
-        sql = """UPDATE {} SET valid = 1 WHERE userID = ? ;""".format(self.usersTable)
+        sql = """UPDATE {} SET valid = 1 WHERE userID = ? ;""".format(self.users_table)
         cur:sqlite3.Cursor = self.db_connection.cursor()
         try:
             cur.execute(sql, ( str(userid), ))
@@ -134,12 +139,52 @@ class DatabaseDAO:
         return True
 
     def devalidate_link(self, userid):
-        sql = """DELETE FROM {} WHERE userID = ? ;""".format(self.usersTable)
+        sql = """DELETE FROM {} WHERE userID = ? ;""".format(self.users_table)
         cur:sqlite3.Cursor = self.db_connection.cursor()
         try:
             cur.execute(sql, ( str(userid), ))
             self.db_connection.commit()
         except Error as e:
             print("Error validating user linkage from users tbl %s - %s"% (sql, e))
+            return False
+        return True
+
+    def create_link(self, userid, ckey, valid=0):
+        """
+        Debug purposes only. Links should be created ingame.
+        """
+        # Check if the userid or ckey are already linked somewhere
+        #### Discord user ID
+        userid_result = self.get_user_data(userid)
+        if userid_result and len( list( userid_result ) ):
+            print("Warning - create_link command - User ID '{}' already exists in the database.".format(userid))
+            return False
+        #### CKEY
+        ckey_result = self.get_user_data(None, ckey)
+        if ckey_result and len( list( ckey_result ) ):
+            print("Warning - create_link command - User CKEY '{}' already exists in the database.".format(ckey))
+            return False
+        # Create the link
+        sql = """INSERT INTO {} VALUES(?,?,?) """.format(self.users_table)
+        cur:sqlite3.Cursor = self.db_connection.cursor()
+        try:
+            cur.execute(sql, ( str(userid), ckey, valid, ))
+            self.db_connection.commit()
+        except Error as e:
+            print("Error creating user linkage on users tbl %s - %s"% (sql, e))
+            return False
+        return True
+
+    def create_message(self, cmd, arguments, message_content):
+        """
+        Debug purposes only. Misuse may lead to disaster.
+        """
+        sql = """INSERT INTO {} VALUES(?, ?, ?) """.format(self.queue_table)
+        cur:sqlite3.Cursor = self.db_connection.cursor()
+        try:
+            cur.execute(sql, ( cmd, arguments, message_content ))
+            self.db_connection.commit()
+        except Error as e:
+            print("Error creating message to queue tbl %s - %s"% (sql, e))
             return False
         return True
