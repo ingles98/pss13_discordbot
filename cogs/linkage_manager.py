@@ -4,7 +4,7 @@ from discord.ext import commands
 
 MESSAGE_LINK_NO_CKEY_PROVIDED = """
 You need to enter your BYOND username. Eg.: "{}validatelink stiigma"
-""".format(BotSettings.command_prefix)
+""".format(BotSettings.config.command_prefix)
 
 MESSAGE_LINK_FAILED = """
 Sorry, but I couldn't process your Discord to Persistence link validation.
@@ -17,13 +17,13 @@ just right-click on your Username and pick "Copy ID" on the context menu, then p
 **Type in the command `"{}getid"` to retrieve your User ID.**
 
 Afterwards, you may validate your linkage here.
-""".format(BotSettings.command_prefix)
+""".format(BotSettings.config.command_prefix)
 
 MESSAGE_LINK_ALREADY_EXISTS = """
 My apologies, but this Discord account is already linked! You may unlink it using the following methods:
     - `{}devalidatelink`
     - `In-game > "Special Verbs" > "Devalidate Discord Link"`
-""".format(BotSettings.command_prefix)
+""".format(BotSettings.config.command_prefix)
 
 MESSAGE_LINK_ERROR = """
 There was a problem processing your validation request. Please, contact a developer.

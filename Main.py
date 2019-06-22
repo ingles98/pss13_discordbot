@@ -3,7 +3,7 @@ import traceback
 from discord.ext import commands
 import BotSettings
 
-bot = commands.Bot(command_prefix=BotSettings.command_prefix)
+bot = commands.Bot(command_prefix=BotSettings.config.command_prefix)
 
 extensions = [
     'cogs.debug',
@@ -13,7 +13,6 @@ extensions = [
 for extension in extensions:
     try:
         bot.load_extension(extension)
-
     except Exception as e:
         print(e)
         traceback.print_exc()
@@ -23,7 +22,7 @@ async def main_loop():
     while True:
         messages = BotSettings.DB.get_messages()
         await BotSettings.bot_actions.process_messages(messages)
-        await asyncio.sleep(BotSettings.main_loop_timer)
+        await asyncio.sleep(BotSettings.config.main_loop_timer)
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -42,4 +41,4 @@ async def on_ready():
     BotSettings.setup_bot(bot)
     bot.loop.create_task(main_loop())
 
-bot.run(BotSettings.token, bot=True, reconnect=True)
+bot.run(BotSettings.config.token, bot=True, reconnect=True)

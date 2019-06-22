@@ -25,7 +25,7 @@ class BotActions:
         for message in messages:
             print(" -- BotActions - Processing message: {}".format(dict(message)))
             cmd = message["command"]
-            args = message["command_arguments"].split(BotSettings.queue_command_arguments_sep) if message["command_arguments"] else None
+            args = message["command_arguments"].split(BotSettings.config.queue_command_arguments_sep) if message["command_arguments"] else None
             message_content = message["msg"]
             print(cmd)
             if cmd == self.COMMAND_MAIL:

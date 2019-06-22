@@ -32,7 +32,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         users_parsed = str()
         for user in users:
             users_parsed += str(dict(user)) +"\n"
-        await ctx.author.send("Users table: \n```{}```".format(users_parsed) )
+        await ctx.author.send("Users table: \n```{}```".format(users_parsed or "N/A") )
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
@@ -44,7 +44,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         queue_parsed = str()
         for msg in queue:
             queue_parsed += str(dict(msg)) +"\n"
-        await ctx.author.send("Queue table: \n```{}```".format(queue_parsed) )
+        await ctx.author.send("Queue table: \n```{}```".format(queue_parsed or "N/A") )
 
 def setup(bot):
     bot.add_cog(DebugCommands(bot))
