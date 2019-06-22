@@ -69,7 +69,7 @@ class LinkageManager(commands.Cog, name="Link validation commands"):
         Validate your discord-BYOND account link through this command.
         """
         userid = ctx.author.id
-        ckey = " ".join(args)
+        ckey = " ".join(args).lower()
         if not ckey:
             await ctx.author.send( MESSAGE_LINK_NO_CKEY_PROVIDED )
             return
