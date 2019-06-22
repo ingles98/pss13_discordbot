@@ -4,5 +4,6 @@
 	"queueTable": "DB_QUEUE_TBL",
 	"usersTable": "DB_USERS_TBL",
 	"serverId": "SERVER_ID",
+	"whitelist": [ARRAY, OF, IDS],
 	"generalChannelId": "GENERAL_CHANNEL_ID"
 }
