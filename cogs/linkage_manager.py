@@ -73,12 +73,15 @@ class LinkageManager(commands.Cog, name="Link validation commands"):
         if not ckey:
             await ctx.author.send( MESSAGE_LINK_NO_CKEY_PROVIDED )
             return
+        # Before querying, we want to make sure this account isnt already linked at all.
+        db_user_data_by_id = self.__get_user_data(userid)
+        if db_user_data_by_id and db_user_data_by_id["valid"]:
+            await ctx.author.send( MESSAGE_LINK_ALREADY_EXISTS )
+            return
+        # Continue in case the user isn't linked
         db_user_data = self.__get_user_data(userid, ckey)
         if not db_user_data:
             await ctx.author.send( MESSAGE_LINK_FAILED )
-            return
-        if db_user_data["valid"]:
-            await ctx.author.send( MESSAGE_LINK_ALREADY_EXISTS )
             return
         if not self.__validate_link(userid):
             await ctx.author.send( MESSAGE_LINK_ERROR )
