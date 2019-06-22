@@ -65,7 +65,9 @@ class LinkageManager(commands.Cog, name="Link validation commands"):
 
     @commands.command()
     async def validatelink(self, ctx, *args):
-        """Usage: <cmd_prefix>validatelink BYOND_KEY"""
+        """
+        Validate your discord-BYOND account link through this command.
+        """
         userid = ctx.author.id
         ckey = " ".join(args)
         if not ckey:
@@ -85,6 +87,9 @@ class LinkageManager(commands.Cog, name="Link validation commands"):
 
     @commands.command()
     async def devalidatelink(self, ctx, *args):
+        """
+        Devalidate your discord-BYOND linkage.
+        """
         userid = ctx.author.id
         if not self.__get_user_data(userid):
             await ctx.author.send( MESSAGE_UNLINK_LINK_DOESNT_EXIST )
@@ -97,7 +102,7 @@ class LinkageManager(commands.Cog, name="Link validation commands"):
 
     @commands.command()
     async def getid(self, ctx, *args):
-        """Returns the Discord User ID."""
+        """Returns your Discord User ID."""
         await ctx.author.send( MESSAGE_USER_ID.format(ctx.author.id) )
 
 def setup(bot):
