@@ -37,8 +37,10 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
                 messages_list.append(users_parsed)
                 users_parsed = str()
             users_parsed += usr_str
+        if users_parsed:
+            messages_list.append(users_parsed)
         if not len(messages_list):
-            await ctx.author.send("The users' table is empty.")
+            return await ctx.author.send("The users' table is empty.")
         for message in messages_list:
             await ctx.author.send("Users table: \n```{}```".format(message) )
 
@@ -49,10 +51,20 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         Retrieves all entries in the Queue table from the database and DMs it to you.
         """
         queue = BotSettings.DB.get_queue()
+        messages_list = list()
         queue_parsed = str()
         for msg in queue:
-            queue_parsed += str(dict(msg)) +"\n"
-        await ctx.author.send("Queue table: \n```{}```".format(queue_parsed or "N/A") )
+            queue_str = str(dict(msg)) +"\n"
+            if len(queue_parsed + queue_str) >= 1400:
+                messages_list.append(queue_parsed)
+                queue_parsed = str()
+            queue_parsed += queue_str
+        if queue_parsed:
+            messages_list.append(queue_parsed)
+        if not len(messages_list):
+            return await ctx.author.send("The queue table is empty.")
+        for message in messages_list:
+            await ctx.author.send("Queue table: \n```{}```".format(message) )
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
