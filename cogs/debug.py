@@ -29,10 +29,18 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         Retrieves all entries in the Users table from the database and DMs it to you.
         """
         users = BotSettings.DB.get_all_users()
+        messages_list = list()
         users_parsed = str()
         for user in users:
-            users_parsed += str(dict(user)) +"\n"
-        await ctx.author.send("Users table: \n```{}```".format(users_parsed or "N/A") )
+            usr_str = str(dict(user)) +"\n"
+            if len(users_parsed + usr_str) >= 1400:
+                messages_list.append(users_parsed)
+                users_parsed = str()
+            users_parsed += usr_str
+        if not len(messages_list):
+            await ctx.author.send("The users' table is empty.")
+        for message in messages_list:
+            await ctx.author.send("Users table: \n```{}```".format(message) )
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
