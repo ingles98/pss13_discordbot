@@ -118,7 +118,8 @@ class DatabaseDAO:
         except Error as e:
             print("Error fetching user data from users tbl %s - %s"% (sql, e))
             return None
-        self.__disconnect()
+        finally:
+            self.__disconnect()
         return result
 
     def get_all_users(self):
@@ -132,7 +133,8 @@ class DatabaseDAO:
         except Error as e:
             print("Error get_all_users %s - %s"% (sql, e))
             return None
-        self.__disconnect()
+        finally:
+            self.__disconnect()
         return result
 
     def get_queue(self):
@@ -145,7 +147,8 @@ class DatabaseDAO:
         except Error as e:
             print("Error fetching data from queue tbl %s - %s"% (sql, e))
             return False
-        self.__disconnect()
+        finally:
+            self.__disconnect()
 
     def validate_link(self, userid):
         self.__reconnect()
