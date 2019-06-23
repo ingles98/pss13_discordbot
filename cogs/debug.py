@@ -143,6 +143,31 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         succ = BotSettings.DB.create_message(cmd, arguments, content)
         await ctx.author.send("Successfully created and enqued a new message." if succ else "There was a problem creating and/or enqueing this message. Check the bot's logs.")
 
+    @commands.command()
+    @commands.check(BotSettings.is_user_whitelisted)
+    async def dbot_pause(self, ctx, *args, member: discord.Member = None):
+        """
+        Prevent the bot from processing the main loop.
+        """
+        if BotSettings.config.process_queue:
+            print("WARNING - BOT MAIN_LOOP PAUSED BY {} (id: {} )".format(ctx.author.name, ctx.author.id))
+            BotSettings.config.process_queue = False
+            await ctx.author.send("The bot's main_loop is now paused.")
+        else:
+            await ctx.author.send("The bot's main_loop is already paused.")
+
+    @commands.command()
+    @commands.check(BotSettings.is_user_whitelisted)
+    async def dbot_resume(self, ctx, *args, member: discord.Member = None):
+        """
+        Resumes the main loop.
+        """
+        if not BotSettings.config.process_queue:
+            print("WARNING - BOT MAIN_LOOP RESUMED BY {} (id: {} )".format(ctx.author.name, ctx.author.id))
+            BotSettings.config.process_queue = True
+            await ctx.author.send("The bot's main_loop is now processing.")
+        else:
+            await ctx.author.send("The bot's main_loop is already processing.")
 
 def setup(bot):
     bot.add_cog(DebugCommands(bot))

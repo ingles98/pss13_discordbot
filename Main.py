@@ -20,8 +20,9 @@ for extension in extensions:
 
 async def main_loop():
     while True:
-        messages = BotSettings.DB.get_messages()
-        await BotSettings.bot_actions.process_messages(messages)
+        if BotSettings.config.process_queue:
+            messages = BotSettings.DB.get_messages()
+            await BotSettings.bot_actions.process_messages(messages)
         await asyncio.sleep(BotSettings.config.main_loop_timer)
 
 @bot.event

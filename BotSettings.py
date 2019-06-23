@@ -44,6 +44,7 @@ class BotConfigurations():
     general_channel_id = 0
     whitelist_debug_commands = list() # A whiteLIST for commands that require it. Currently only the debug Cog commands should require it.
                                 # Can be user ID's (INT) or server roles (STR)
+    process_queue = True # Used in the main_loop so we can pause/resume the bot querying the database.
 
     def __init__(self):
         if not self.load_config():

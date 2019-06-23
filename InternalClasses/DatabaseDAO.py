@@ -23,11 +23,21 @@ class DatabaseDAO:
     def __setup_connection(self):
         conn = None
         try:
-            conn = sqlite3.connect(self.db_path, 5)
+            conn = sqlite3.connect(self.db_path, 10, isolation_level=None)
         except Error as e:
             print(e)
         conn.row_factory = sqlite3.Row
         self.db_connection = conn
+
+    def __disconnect(self):
+        if self.db_connection:
+            self.db_connection.commit()
+            self.db_connection.close()
+            self.db_connection = None
+
+    def __reconnect(self):
+        if not self.db_connection:
+            self.__setup_connection()
 
     def __setup_tables(self):
         # Users table SQL
@@ -56,16 +66,19 @@ class DatabaseDAO:
         self.__create_table(queue_tbl_sql)
 
     def __create_table(self, tbl_sql):
+        self.__reconnect()
         if not self.db_connection:
             raise("No connection to database found!")
         try:
             c = self.db_connection.cursor()
             c.execute(tbl_sql)
-            self.db_connection.commit()
         except Error as e:
             print("Error creating database table %s - %s"% (tbl_sql, e))
+        finally:
+            self.__disconnect()
 
     def get_messages(self):
+        self.__reconnect()
         result = self.get_queue()
         if not result:
             return None
@@ -74,13 +87,15 @@ class DatabaseDAO:
         cur = self.db_connection.cursor()
         try:
             cur.execute(sql)
-            self.db_connection.commit()
         except Error as e:
             print("Error deleting data from queue tbl %s - %s"% (sql, e))
             return None
+        finally:
+            self.__disconnect()
         return result
 
     def get_user_data(self, userid=None, ckey=None):
+        self.__reconnect()
         if not userid and not ckey:
             return None
         params = tuple()
@@ -103,9 +118,11 @@ class DatabaseDAO:
         except Error as e:
             print("Error fetching user data from users tbl %s - %s"% (sql, e))
             return None
+        self.__disconnect()
         return result
 
     def get_all_users(self):
+        self.__reconnect()
         sql = """SELECT * FROM {}""".format(self.users_table)
         cur:sqlite3.Cursor = self.db_connection.cursor()
         result = None
@@ -115,9 +132,11 @@ class DatabaseDAO:
         except Error as e:
             print("Error get_all_users %s - %s"% (sql, e))
             return None
+        self.__disconnect()
         return result
 
     def get_queue(self):
+        self.__reconnect()
         sql = "SELECT * FROM {};".format(self.queue_table)
         cur = self.db_connection.cursor()
         try:
@@ -126,33 +145,39 @@ class DatabaseDAO:
         except Error as e:
             print("Error fetching data from queue tbl %s - %s"% (sql, e))
             return False
+        self.__disconnect()
 
     def validate_link(self, userid):
+        self.__reconnect()
         sql = """UPDATE {} SET valid = 1 WHERE userID = ? ;""".format(self.users_table)
         cur:sqlite3.Cursor = self.db_connection.cursor()
         try:
             cur.execute(sql, ( str(userid), ))
-            self.db_connection.commit()
         except Error as e:
             print("Error validating user linkage from users tbl %s - %s"% (sql, e))
             return False
+        finally:
+            self.__disconnect()
         return True
 
     def devalidate_link(self, userid):
+        self.__reconnect()
         sql = """DELETE FROM {} WHERE userID = ? ;""".format(self.users_table)
         cur:sqlite3.Cursor = self.db_connection.cursor()
         try:
             cur.execute(sql, ( str(userid), ))
-            self.db_connection.commit()
         except Error as e:
             print("Error validating user linkage from users tbl %s - %s"% (sql, e))
             return False
+        finally:
+            self.__disconnect()
         return True
 
     def create_link(self, userid, ckey, valid=0):
         """
         Debug purposes only. Links should be created ingame.
         """
+        self.__reconnect()
         # Check if the userid or ckey are already linked somewhere
         #### Discord user ID
         userid_result = self.get_user_data(userid)
@@ -169,22 +194,25 @@ class DatabaseDAO:
         cur:sqlite3.Cursor = self.db_connection.cursor()
         try:
             cur.execute(sql, ( str(userid), ckey, valid, ))
-            self.db_connection.commit()
         except Error as e:
             print("Error creating user linkage on users tbl %s - %s"% (sql, e))
             return False
+        finally:
+            self.__disconnect()
         return True
 
     def create_message(self, cmd, arguments, message_content):
         """
         Debug purposes only. Misuse may lead to disaster.
         """
+        self.__reconnect()
         sql = """INSERT INTO {} VALUES(?, ?, ?) """.format(self.queue_table)
         cur:sqlite3.Cursor = self.db_connection.cursor()
         try:
             cur.execute(sql, ( cmd, arguments, message_content ))
-            self.db_connection.commit()
         except Error as e:
             print("Error creating message to queue tbl %s - %s"% (sql, e))
             return False
+        finally:
+            self.__disconnect()
         return True
