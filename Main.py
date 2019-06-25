@@ -6,7 +6,6 @@ import BotSettings
 bot = commands.Bot(command_prefix=BotSettings.config.command_prefix)
 
 extensions = [
-    'cogs.debug',
     'cogs.linkage_manager'
 ]
 
@@ -24,6 +23,24 @@ async def main_loop():
             messages = BotSettings.DB.get_messages()
             await BotSettings.bot_actions.process_messages(messages)
         await asyncio.sleep(BotSettings.config.main_loop_timer)
+
+
+@bot.command()
+@commands.check(BotSettings.is_user_whitelisted)
+async def load(ctx, extension: str):
+    """
+    Loads an extension
+
+    Example: !load cogs.debug
+    """
+
+    try:
+        bot.load_extension(extension)
+
+    except (AttributeError, ImportError) as e:
+        await ctx.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+
+    await ctx.send("{} loaded".format(extension))
 
 
 @bot.event
