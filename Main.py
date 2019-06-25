@@ -25,12 +25,14 @@ async def main_loop():
             await BotSettings.bot_actions.process_messages(messages)
         await asyncio.sleep(BotSettings.config.main_loop_timer)
 
+
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CheckFailure ):
-    	print("WARNING --- User {} is attempting to execute the command '{}' but failed the whitelist/permissions checks.".format( {"name": ctx.author.name, "id": ctx.author.id}, ctx.command.name ) )
+        print("WARNING --- User {} is attempting to execute the command '{}' but failed the whitelist/permissions checks.".format({"name": ctx.author.name, "id": ctx.author.id}, ctx.command.name))
     else:
         print(error)
+
 
 @bot.event
 async def on_ready():

@@ -2,6 +2,7 @@ import BotSettings
 import discord
 from discord.ext import commands
 
+
 class DebugCommands(commands.Cog, name="Debug Commands"):
     def __init__(self, bot):
         self.bot = bot
@@ -32,7 +33,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         messages_list = list()
         users_parsed = str()
         for user in users:
-            usr_str = str(dict(user)) +"\n"
+            usr_str = str(dict(user)) + "\n"
             if len(users_parsed + usr_str) >= 1400:
                 messages_list.append(users_parsed)
                 users_parsed = str()
@@ -54,7 +55,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         messages_list = list()
         queue_parsed = str()
         for msg in queue:
-            queue_str = str(dict(msg)) +"\n"
+            queue_str = str(dict(msg)) + "\n"
             if len(queue_parsed + queue_str) >= 1400:
                 messages_list.append(queue_parsed)
                 queue_parsed = str()
@@ -64,7 +65,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         if not len(messages_list):
             return await ctx.author.send("The queue table is empty.")
         for message in messages_list:
-            await ctx.author.send("Queue table: \n```{}```".format(message) )
+            await ctx.author.send("Queue table: \n```{}```".format(message))
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
@@ -97,8 +98,8 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             int(user)
         except:
             is_ckey = True
-        
-        user_data = BotSettings.DB.get_user_data( user if not is_ckey else None, user if is_ckey else None)
+
+        user_data = BotSettings.DB.get_user_data(user if not is_ckey else None, user if is_ckey else None)
         if not user_data:
             return await ctx.author.send("There is no entry with that user ID/CKEY.")
         if user_data["valid"]:
@@ -120,8 +121,8 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             int(user)
         except:
             is_ckey = True
-        
-        user_data = BotSettings.DB.get_user_data( user if not is_ckey else None, user if is_ckey else None)
+
+        user_data = BotSettings.DB.get_user_data(user if not is_ckey else None, user if is_ckey else None)
         if not user_data:
             return await ctx.author.send("There is no entry with that user ID/CKEY.")
         succ = BotSettings.DB.devalidate_link(user_data["userID"])
@@ -168,6 +169,22 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             await ctx.author.send("The bot's main_loop is now processing.")
         else:
             await ctx.author.send("The bot's main_loop is already processing.")
+
+    @commands.command()
+    @commands.check(BotSettings.is_user_whitelisted)
+    async def db_announce(self, ctx, *args):
+        """
+        Tests announcement system.
+        """
+
+        announce_string = ' '.join(args)
+        announce_embed = discord.Embed(
+            title=u'\U0001f6f0 Incoming Transmission',
+            description=announce_string,
+            color=0xadd8e6)
+
+        await ctx.send(embed=announce_embed)
+
 
 def setup(bot):
     bot.add_cog(DebugCommands(bot))
