@@ -46,7 +46,11 @@ async def load(ctx, extension: str):
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CheckFailure ):
-        print("WARNING --- User {} is attempting to execute the command '{}' but failed the whitelist/permissions checks.".format({"name": ctx.author.name, "id": ctx.author.id}, ctx.command.name))
+        print("WARNING --- User {} is attempting to execute the " +
+              "command '{}' but failed the whitelist/permissions " +
+              "checks.".format(
+                  {"name": ctx.author.name, "id": ctx.author.id},
+                  ctx.command.name))
     else:
         print(error)
 

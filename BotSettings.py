@@ -22,12 +22,13 @@ EXITING!
 ----------
 """
 
+
 class BotConfigurations():
     """
     Handles the configurations.
     """
     """
-    The seperator between arguments inside a string because spaces could be
+    The separator between arguments inside a string because spaces could be
     insufficient. Use the same seperator as in the game's code:
 
     (code/modules/discord_persistence/_hook.dm)
@@ -42,9 +43,14 @@ class BotConfigurations():
     users_table = str()
     server_id = 0   # Currently not used
     general_channel_id = 0
-    whitelist_debug_commands = list() # A whiteLIST for commands that require it. Currently only the debug Cog commands should require it.
-                                # Can be user ID's (INT) or server roles (STR)
-    process_queue = True # Used in the main_loop so we can pause/resume the bot querying the database.
+
+    """
+    A whitelist for commands that require it. Currently onl the debug Cog
+    commands should require it. Can be a user's ID (int) or server role (str).
+    """
+    whitelist_debug_commands = list()
+
+    process_queue = True  # Used in the main loop to pause/resume bot queries.
 
     def __init__(self):
         if not self.load_config():
@@ -63,8 +69,10 @@ class BotConfigurations():
                 self.queue_table = data.pop("queueTable", self.queue_table)
                 self.users_table = data.pop("usersTable", self.users_table)
                 self.server_id = int(data.pop("serverId", self.server_id))
-                self.general_channel_id = int(data.pop("generalChannelId", self.general_channel_id))
-                self.whitelist_debug_commands = data.pop("whitelist", self.whitelist_debug_commands)
+                self.general_channel_id = int(
+                    data.pop("generalChannelId", self.general_channel_id))
+                self.whitelist_debug_commands = data.pop(
+                    "whitelist", self.whitelist_debug_commands)
                 return True
         else:
             print(MESSAGE_CONFIG_NOT_FOUND)
@@ -76,17 +84,22 @@ bot_actions: BotActions = None
 bot_ref: Bot = None
 bot_general_channel_ref: discord.TextChannel = None
 
+
 def is_user_whitelisted(ctx):
-    # Check if the user ID is in the whitelist
+    """
+    Simple whitelist check.
+    Returns true if ctx.author or ctx.guild is found in whitelist.
+    """
+
     if ctx.author.id in config.whitelist_debug_commands:
         return True
-    # Check if the context is of a server(guild) and if so, check if the member has whitelisted roles.
     if ctx.guild:
         member = ctx.guild.get_member(ctx.author.id)
         for role in member.roles:
             if role.name in config.whitelist_debug_commands:
                 return True
     return False
+
 
 def setup_bot(bot: Bot):
     # Save reference to the Bot

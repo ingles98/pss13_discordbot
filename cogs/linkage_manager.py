@@ -1,5 +1,4 @@
 import BotSettings
-import discord
 from discord.ext import commands
 
 MESSAGE_LINK_NO_CKEY_PROVIDED = """
@@ -9,24 +8,32 @@ You need to enter your BYOND username. Eg.: "{}validatelink stiigma"
 MESSAGE_LINK_FAILED = """
 Sorry, but I couldn't process your Discord to Persistence link validation.
 
-Have you already linked your acount in-game? Or perhaps `you're not typing your BYOND username (aka ckey) correctly!`
-To do so, simply join the server, press the `"Special Verbs"` tab and `"Link Discord Account"`
+Have you already linked your acount in-game? Or perhaps `you're not typing your
+BYOND username (aka ckey) correctly!`
 
-~~You'll just need to enter DEVELOPER MODE on discord to be able to grab your user ID. If it is enabled, 
-just right-click on your Username and pick "Copy ID" on the context menu, then paste it on the input window that had popped in-game.~~
+To do so, simply join the server, press the `"Special Verbs"` tab and
+`"Link Discord Account"`
+
+You'll just need to enter DEVELOPER MODE on discord to be able to grab your
+user ID. If it is enabled, just right-click on your Username and pick "Copy ID"
+on the context menu, then paste it on the input window that had popped
+in-game.
+
 **Type in the command `"{}getid"` to retrieve your User ID.**
 
 Afterwards, you may validate your linkage here.
 """.format(BotSettings.config.command_prefix)
 
 MESSAGE_LINK_ALREADY_EXISTS = """
-My apologies, but this Discord account is already linked! You may unlink it using the following methods:
+My apologies, but this Discord account is already linked! You may unlink it
+using the following methods:
     - `{}devalidatelink`
     - `In-game > "Special Verbs" > "Devalidate Discord Link"`
 """.format(BotSettings.config.command_prefix)
 
 MESSAGE_LINK_ERROR = """
-There was a problem processing your validation request. Please, contact a developer.
+There was a problem processing your validation request. Please, contact a
+developer.
 """
 
 MESSAGE_LINK_SUCCESS = """
@@ -34,20 +41,23 @@ Hooray! Your account has been linked!
 """
 
 MESSAGE_UNLINK_LINK_DOESNT_EXIST = """
-It seems like your discord account isn't linked to any BYOND account on Persistence.
+It seems like your discord account isn't linked to any BYOND account on
+Persistence.
 """
 
 MESSAGE_UNLINK_ERROR = """
-There was a problem processing your devalidation request. Please, contact a developer.
+There was a problem processing your de-validation request. Please, contact a
+developer.
 """
 
 MESSAGE_UNLINK_SUCCESS = """
-Your account has been successfuly unlinked.
+Your account has been successfully unlinked.
 """
 
 MESSAGE_USER_ID = """
 Here's your Discord User ID: {}
 """
+
 
 class LinkageManager(commands.Cog, name="Link validation commands"):
     def __init__(self, bot):
@@ -73,7 +83,7 @@ class LinkageManager(commands.Cog, name="Link validation commands"):
         if not ckey:
             await ctx.author.send( MESSAGE_LINK_NO_CKEY_PROVIDED )
             return
-        # Before querying, we want to make sure this account isnt already linked at all.
+        # Before querying, we make sure this account isn't already linked.
         db_user_data_by_id = self.__get_user_data(userid)
         if db_user_data_by_id and db_user_data_by_id["valid"]:
             await ctx.author.send( MESSAGE_LINK_ALREADY_EXISTS )
@@ -107,6 +117,7 @@ class LinkageManager(commands.Cog, name="Link validation commands"):
     async def getid(self, ctx, *args):
         """Returns your Discord User ID."""
         await ctx.author.send( MESSAGE_USER_ID.format(ctx.author.id) )
+
 
 def setup(bot):
     bot.add_cog(LinkageManager(bot))

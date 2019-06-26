@@ -2,6 +2,7 @@ import sqlite3
 from sqlite3 import Error
 import os
 
+
 class DatabaseDAO:
     """
     This class is responsible for parsing data from the database.
@@ -152,12 +153,15 @@ class DatabaseDAO:
 
     def validate_link(self, userid):
         self.__reconnect()
-        sql = """UPDATE {} SET valid = 1 WHERE userID = ? ;""".format(self.users_table)
+        sql = """UPDATE {} SET valid = 1 WHERE userID = ? ;""".format(
+            self.users_table)
         cur:sqlite3.Cursor = self.db_connection.cursor()
         try:
             cur.execute(sql, ( str(userid), ))
         except Error as e:
-            print("Error validating user linkage from users tbl %s - %s"% (sql, e))
+            print(
+                "Error validating user linkage from users tbl %s - %s"% (
+                    sql, e))
             return False
         finally:
             self.__disconnect()
@@ -170,7 +174,9 @@ class DatabaseDAO:
         try:
             cur.execute(sql, ( str(userid), ))
         except Error as e:
-            print("Error validating user linkage from users tbl %s - %s"% (sql, e))
+            print(
+                "Error validating user linkage from users tbl %s - %s"% (
+                    sql, e))
             return False
         finally:
             self.__disconnect()
@@ -185,12 +191,14 @@ class DatabaseDAO:
         #### Discord user ID
         userid_result = self.get_user_data(userid)
         if userid_result and len( list( userid_result ) ):
-            print("Warning - create_link command - User ID '{}' already exists in the database.".format(userid))
+            print("Warning - create_link command - User ID '{}' already" +
+                  " exists in the database.".format(userid))
             return False
         #### CKEY
         ckey_result = self.get_user_data(None, ckey)
         if ckey_result and len( list( ckey_result ) ):
-            print("Warning - create_link command - User CKEY '{}' already exists in the database.".format(ckey))
+            print("Warning - create_link command - User CKEY '{}' already" +
+                  " exists in the database.".format(ckey))
             return False
         # Create the link
         sql = """INSERT INTO {} VALUES(?,?,?) """.format(self.users_table)

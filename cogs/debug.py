@@ -27,7 +27,8 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
     @commands.check(BotSettings.is_user_whitelisted)
     async def db_get_users(self, ctx, *, member: discord.Member = None):
         """
-        Retrieves all entries in the Users table from the database and DMs it to you.
+        Retrieves all entries in the Users table from the database and
+        DMs it to you.
         """
         users = BotSettings.DB.get_all_users()
         messages_list = list()
@@ -49,7 +50,8 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
     @commands.check(BotSettings.is_user_whitelisted)
     async def db_get_queue(self, ctx, *, member: discord.Member = None):
         """
-        Retrieves all entries in the Queue table from the database and DMs it to you.
+        Retrieves all entries in the Queue table from the database and
+        DMs it to you.
         """
         queue = BotSettings.DB.get_queue()
         messages_list = list()
@@ -80,18 +82,24 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             userid, ckey, valid = args
             valid = 1 if valid else 0   # Making sure ppl dont fuck this one up
         else:
-            return await ctx.author.send("Invalid usage. Needs at least two arguments. USER_ID CKEY [VALID? (0 or 1) ]")
+            return await ctx.author.send("Invalid usage. Needs at least " +
+                                         "two arguments. USER_ID CKEY " +
+                                         "[VALID? (0 or 1) ]")
         succ = BotSettings.DB.create_link(userid, ckey, valid)
-        await ctx.author.send("Successfuly created link." if succ else "Something went wrong while creating the link. Check the bot's logs.")
+        await ctx.author.send("Successfully created link." if succ else
+                              "Something went wrong while creating " +
+                              "the link. Check the bot's logs.")
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
     async def db_validate_link(self, ctx, *args, member: discord.Member = None):
         """
-        Manually validates an existing link. Argument may be either a discord ID or a CKEY.
+        Manually validates an existing link. Argument may be either a
+        discord ID or a CKEY.
         """
         if not args or not len(args):
-            return await ctx.author.send("Invalid usage. Needs at least one argument. (User ID or CKEY)")
+            return await ctx.author.send("Invalid usage. Needs at least one " +
+                                         "argument. (User ID or CKEY)")
         is_ckey = False
         user = args[0]
         try:
@@ -99,22 +107,30 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         except:
             is_ckey = True
 
-        user_data = BotSettings.DB.get_user_data(user if not is_ckey else None, user if is_ckey else None)
+        user_data = BotSettings.DB.get_user_data(user if not is_ckey else None,
+                                                 user if is_ckey else None)
         if not user_data:
-            return await ctx.author.send("There is no entry with that user ID/CKEY.")
+            return await ctx.author.send("There is no entry with that " +
+                                         "user ID/CKEY.")
         if user_data["valid"]:
             return await ctx.author.send("This linkage is already validated.")
         succ = BotSettings.DB.validate_link(user_data["userID"])
-        await ctx.author.send("Succesfully validated this user's link." if succ else "There was a problem validating this link. Check the bot's logs.")
+        await ctx.author.send("Succesfully validated this user's link."
+                              if succ else "There was a problem validating " +
+                                           "this link. Check the bot's logs.")
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
-    async def db_devalidate_link(self, ctx, *args, member: discord.Member = None):
+    async def db_devalidate_link(self,
+                                 ctx,
+                                 *args,
+                                 member: discord.Member = None):
         """
         Manually removes an existing link.
         """
         if not args or not len(args):
-            return await ctx.author.send("Invalid usage. Needs at least one argument. (User ID or CKEY)")
+            return await ctx.author.send("Invalid usage. Needs at least " +
+                                         "one argument. (User ID or CKEY)")
         is_ckey = False
         user = args[0]
         try:
@@ -122,27 +138,43 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         except:
             is_ckey = True
 
-        user_data = BotSettings.DB.get_user_data(user if not is_ckey else None, user if is_ckey else None)
+        user_data = BotSettings.DB.get_user_data(user if not is_ckey else None,
+                                                 user if is_ckey else None)
         if not user_data:
-            return await ctx.author.send("There is no entry with that user ID/CKEY.")
+            return await ctx.author.send(
+                "There is no entry with that user ID/CKEY.")
         succ = BotSettings.DB.devalidate_link(user_data["userID"])
-        await ctx.author.send("Succesfully devalidated this user's link." if succ else "There was a problem devalidating this link. Check the bot's logs.")
+        await ctx.author.send(
+            "Succesfully devalidated this user's link." if succ else
+            "There was a problem devalidating this link. Check the bot's logs.")
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
-    async def db_create_message(self, ctx, *args, member: discord.Member = None):
+    async def db_create_message(self,
+                                ctx,
+                                *args,
+                                member: discord.Member = None):
         """
         Manually creates and enqueues a message.
         First argument: command eg: MAIL or BROADCAST (Always on all caps.)
-        Second argument: arguments (Have to be between quotes and seperated arguments using a special seperator set on the configs) eg: "firstarg[[sep]]secondarg[[sep]]you get it[[sep]]fuckthis"
+
+        Second argument: arguments (Have to be between quotes and seperated
+        arguments using a special seperator set on the configs)
+        eg: "arg1[[sep]]arg2[[sep]]you get it[[sep]]fuckthis"
+
         Third argument: message content
-        (BROADCAST doesnt expect arguments at the moment. Send empty double quotes.)
+
+        (BROADCAST doesnt expect arguments at the moment.
+        Send empty double quotes.)
         """
         if not args or len(args) != 3:
             return await ctx.author.send("Invalid number of arguments.")
         cmd, arguments, content = args
         succ = BotSettings.DB.create_message(cmd, arguments, content)
-        await ctx.author.send("Successfully created and enqued a new message." if succ else "There was a problem creating and/or enqueing this message. Check the bot's logs.")
+        await ctx.author.send(
+            "Successfully created and enqued a new message." if succ else
+            "There was a problem creating and/or enqueing this message. " +
+            "Check the bot's logs.")
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
@@ -151,7 +183,10 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         Prevent the bot from processing the main loop.
         """
         if BotSettings.config.process_queue:
-            print("WARNING - BOT MAIN_LOOP PAUSED BY {} (id: {} )".format(ctx.author.name, ctx.author.id))
+            print(
+                "WARNING - BOT MAIN_LOOP PAUSED BY {} (id: {} )".format(
+                    ctx.author.name, ctx.author.id))
+
             BotSettings.config.process_queue = False
             await ctx.author.send("The bot's main_loop is now paused.")
         else:
@@ -164,7 +199,10 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         Resumes the main loop.
         """
         if not BotSettings.config.process_queue:
-            print("WARNING - BOT MAIN_LOOP RESUMED BY {} (id: {} )".format(ctx.author.name, ctx.author.id))
+            print(
+                "WARNING - BOT MAIN_LOOP RESUMED BY {} (id: {} )".format(
+                    ctx.author.name, ctx.author.id))
+
             BotSettings.config.process_queue = True
             await ctx.author.send("The bot's main_loop is now processing.")
         else:
