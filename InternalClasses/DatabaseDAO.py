@@ -79,8 +79,8 @@ class DatabaseDAO:
             self.__disconnect()
 
     def get_messages(self):
-        self.__reconnect()
         result = self.get_queue()
+        self.__reconnect()
         if not result:
             return None
         # Delete the queue

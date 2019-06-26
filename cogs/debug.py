@@ -107,6 +107,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         except:
             is_ckey = True
 
+
         user_data = BotSettings.DB.get_user_data(user if not is_ckey else None,
                                                  user if is_ckey else None)
         if not user_data:
@@ -137,6 +138,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             int(user)
         except:
             is_ckey = True
+
 
         user_data = BotSettings.DB.get_user_data(user if not is_ckey else None,
                                                  user if is_ckey else None)

@@ -51,6 +51,7 @@ async def on_command_error(ctx, error):
               "checks.".format(
                   {"name": ctx.author.name, "id": ctx.author.id},
                   ctx.command.name))
+
     else:
         print(error)
 
