@@ -49,15 +49,20 @@ class BotActions:
 
         formatted_message = message_content.replace("[editorbr]", "\n").replace("[br]", "\n")
         print( discord_user_id, ic_sender, ic_receiver, message_content)
-        announce_embed = discord.Embed(
+        mail_embed = discord.Embed(
             title=u'\U0001f6f0 Incoming Transmission',
             description="You've got mail!",
             color=0xadd8e6)
-        announce_embed.add_field(name="From:", value=ic_sender, inline=True)
-        announce_embed.add_field(name="To:", value=ic_receiver, inline=True)
-        announce_embed.add_field(name="Title:", value=message_title, inline=True)
-        announce_embed.add_field(name="\u200b", value=formatted_message, inline=False)
-        await discord_user.send(embed=announce_embed)
+        mail_embed.add_field(name="From:", value=ic_sender, inline=True)
+        mail_embed.add_field(name="To:", value=ic_receiver, inline=True)
+        mail_embed.add_field(name="Title:", value=message_title, inline=True)
+        mail_embed.add_field(name="\u200b", value=formatted_message, inline=False)
+        await discord_user.send(embed=mail_embed)
 
     async def send_broadcast(self, args:list, message_content:str):
-        await BotSettings.bot_general_channel_ref.send(message_content)
+        announce_embed = discord.Embed(
+            title=u'\U0001f6f0 Incoming Transmission',
+            color=0x000000)
+        announce_embed.add_field(name="\u200b", value=message_content, inline=False)
+        announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
+        await BotSettings.bot_general_channel_ref.send(embed=announce_embed)
