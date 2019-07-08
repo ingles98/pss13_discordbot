@@ -42,6 +42,7 @@ class BotConfigurations():
     users_table = str()
     server_id = 0   # Currently not used
     general_channel_id = 0
+    ahelp_channel_id = 0
     whitelist_debug_commands = list() # A whiteLIST for commands that require it. Currently only the debug Cog commands should require it.
                                 # Can be user ID's (INT) or server roles (STR)
     process_queue = True # Used in the main_loop so we can pause/resume the bot querying the database.
@@ -64,6 +65,7 @@ class BotConfigurations():
                 self.users_table = data.pop("usersTable", self.users_table)
                 self.server_id = int(data.pop("serverId", self.server_id))
                 self.general_channel_id = int(data.pop("generalChannelId", self.general_channel_id))
+                self.ahelp_channel_id = int(data.pop("ahelpChannelId", self.general_channel_id))
                 self.whitelist_debug_commands = data.pop("whitelist", self.whitelist_debug_commands)
                 return True
         else:
@@ -75,6 +77,7 @@ DB: DatabaseDAO = None
 bot_actions: BotActions = None
 bot_ref: Bot = None
 bot_general_channel_ref: discord.TextChannel = None
+bot_ahelp_channel_ref: discord.TextChannel = None
 
 def is_user_whitelisted(ctx):
     # Check if the user ID is in the whitelist
@@ -104,3 +107,6 @@ def setup_bot(bot: Bot):
     # Setup general channel discord object reference
     global bot_general_channel_ref
     bot_general_channel_ref = bot.get_channel(config.general_channel_id)
+
+    global bot_ahelp_channel_ref
+    bot_ahelp_channel_ref = bot.get_channel(config.ahelp_channel_id)

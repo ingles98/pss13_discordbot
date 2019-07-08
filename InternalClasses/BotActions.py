@@ -10,6 +10,7 @@ class BotActions:
 
     COMMAND_MAIL = "MAIL"
     COMMAND_BROADCAST = "BROADCAST"
+    COMMAND_AHELP = "AHELP"
 
     async def process_messages(self, messages:list) -> None:
         """
@@ -33,6 +34,8 @@ class BotActions:
                 await self.send_mail(args, message_content)
             elif cmd == self.COMMAND_BROADCAST:
                 await self.send_broadcast(args, message_content)
+            elif cmd == self.COMMAND_AHELP:
+                await self.send_ahelp(args, message_content)
             else:
                 print("ERROR - Received a message with an unknown command !")
             print(" -- ")
@@ -66,3 +69,13 @@ class BotActions:
         announce_embed.add_field(name="\u200b", value=message_content, inline=False)
         announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
         await BotSettings.bot_general_channel_ref.send(embed=announce_embed)
+
+    async def send_ahelp(self, args:list, message_content:str):
+        ckey, character = args
+        announce_embed = discord.Embed(
+            title=u'\U0001f6f0 NEW IN-GAME TICKET OPEN',
+            color=0x000000)
+        announce_embed.add_field(name="User key:", value=ckey, inline=True)
+        announce_embed.add_field(name="User character:", value=character, inline=True)
+        announce_embed.add_field(name="\u200b", value=message_content, inline=False)
+        await BotSettings.bot_ahelp_channel_ref.send(embed=announce_embed)
