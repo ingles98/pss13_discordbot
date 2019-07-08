@@ -72,6 +72,9 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
     async def db_create_link(self, ctx, *args, member: discord.Member = None):
         """
         Manually creates a link between a discord account and a BYOND one.
+          - 1st arg: Discord User ID
+          - 2nd arg: BYOND CKEY
+          - 3rd arg (optional): Valid ? 1, else 0 (DEFAULT: 0)
         """
         valid = 0
         if len(args) == 2:
@@ -89,6 +92,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
     async def db_validate_link(self, ctx, *args, member: discord.Member = None):
         """
         Manually validates an existing link. Argument may be either a discord ID or a CKEY.
+          - arg: Discord User ID, or CKEY
         """
         if not args or not len(args):
             return await ctx.author.send("Invalid usage. Needs at least one argument. (User ID or CKEY)")
@@ -112,6 +116,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
     async def db_devalidate_link(self, ctx, *args, member: discord.Member = None):
         """
         Manually removes an existing link.
+          - arg: Discord User ID, or CKEY
         """
         if not args or not len(args):
             return await ctx.author.send("Invalid usage. Needs at least one argument. (User ID or CKEY)")
@@ -133,9 +138,9 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
     async def db_create_message(self, ctx, *args, member: discord.Member = None):
         """
         Manually creates and enqueues a message.
-        First argument: command eg: MAIL or BROADCAST (Always on all caps.)
-        Second argument: arguments (Have to be between quotes and seperated arguments using a special seperator set on the configs) eg: "firstarg[[sep]]secondarg[[sep]]you get it[[sep]]fuckthis"
-        Third argument: message content
+          - 1st arg: command eg: MAIL or BROADCAST | Always on all caps
+          - 2nd arg: arguments (Have to be between quotes and seperated arguments using a special seperator set on the configs) eg: "firstarg[[sep]]secondarg[[sep]]you get it[[sep]]fuckthis"
+          - 3rd arg: message content
         (BROADCAST doesnt expect arguments at the moment. Send empty double quotes.)
         """
         if not args or len(args) != 3:
