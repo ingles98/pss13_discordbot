@@ -172,9 +172,9 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
 
     @commands.command()
     @commands.check(BotSettings.is_user_whitelisted)
-    async def db_announce(self, ctx, *args):
+    async def embed_test(self, ctx, *args):
         """
-        Tests announcement system.
+        Tests embedded announcement system.
         """
 
         announce_string = ' '.join(args)
@@ -182,9 +182,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             title=u'\U0001f6f0 Incoming Transmission',
             description=announce_string,
             color=0xadd8e6)
-
         await ctx.send(embed=announce_embed)
-
 
 def setup(bot):
     bot.add_cog(DebugCommands(bot))

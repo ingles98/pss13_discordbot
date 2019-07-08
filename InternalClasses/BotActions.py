@@ -1,5 +1,6 @@
 import BotSettings
 import asyncio
+import discord
 
 class BotActions:
     """
@@ -48,8 +49,15 @@ class BotActions:
 
         formatted_message = message_content.replace("[editorbr]", "\n").replace("[br]", "\n")
         print( discord_user_id, ic_sender, ic_receiver, message_content)
-        content = """You've got mail!\n\nFrom: `{}`\nTo: `{}`\nTitle: `{}`\n\n```{}```""".format( ic_sender, ic_receiver, message_title, formatted_message )
-        await discord_user.send(content)
+        announce_embed = discord.Embed(
+            title=u'\U0001f6f0 Incoming Transmission',
+            description="You've got mail!",
+            color=0xadd8e6)
+        announce_embed.add_field(name="From:", value=ic_sender, inline=True)
+        announce_embed.add_field(name="To:", value=ic_receiver, inline=True)
+        announce_embed.add_field(name="Title:", value=message_title, inline=True)
+        announce_embed.add_field(name="\u200b", value=formatted_message, inline=False)
+        await discord_user.send(embed=announce_embed)
 
     async def send_broadcast(self, args:list, message_content:str):
         await BotSettings.bot_general_channel_ref.send(message_content)
