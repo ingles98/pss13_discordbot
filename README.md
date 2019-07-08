@@ -2,6 +2,8 @@
 
 A Discord bot written in Python. It handles communications between Discord and the SS13 server.
 
+<a href="https://github.com/Persistent-SS13/Persistent-Bay/" style="">Official PSS13 Codebase</a>
+
 ### Installation
 ```
 git clone https://github.com/ingles98/pss13_discordbot    # clone the repo.
