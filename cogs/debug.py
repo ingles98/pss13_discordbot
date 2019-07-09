@@ -182,7 +182,7 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
         Tests embedded announcement system.
         """
 
-        announce_string = ' '.join(args)
+        announce_string = ' '.join(args if args else " ")
         announce_embed = discord.Embed(
             title=u'\U0001f6f0 Incoming Transmission',
             description=announce_string,

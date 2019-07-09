@@ -68,7 +68,7 @@ class BotActions:
             color=0x000000)
         announce_embed.add_field(name="\u200b", value=message_content, inline=False)
         announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
-        await BotSettings.bot_general_channel_ref.send(embed=announce_embed)
+        await BotSettings.bot_ai_channel_ref.send(embed=announce_embed)
 
     async def send_ahelp(self, args:list, message_content:str):
         ckey, character = args
