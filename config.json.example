@@ -3,9 +3,12 @@
 	"db": "PATH\\TO\\DB",
 	"queueTable": "DB_QUEUE_TBL",
 	"usersTable": "DB_USERS_TBL",
+	"dykTable": "DB_DYK_ENTRIES_TBL"
 	"serverId": "SERVER_ID",
 	"whitelist": [ARRAY, OF, IDS],
 	"generalChannelId": "GENERAL_CHANNEL_ID",
 	"aiChannelId": "AI_BROADCAST_CHANNEL_ID",
-	"ahelpChannelId": "AHELP_CHANNEL_ID"
+	"ahelpChannelId": "AHELP_CHANNEL_ID",
+	"dykInterval": "DYK_INTERVAL",
+	"dykCooldown": "DYK_COOLDOWN"
 }
