@@ -189,5 +189,52 @@ class DebugCommands(commands.Cog, name="Debug Commands"):
             color=0xadd8e6)
         await ctx.send(embed=announce_embed)
 
+    @commands.command()
+    @commands.check(BotSettings.is_user_whitelisted)
+    async def dyk_create(self, ctx, *args):
+        """
+        Creates a new 'Did You Know' entry announcement message.
+        """
+        text = ' '.join(args if args else " ")
+        if BotSettings.DB.create_dyk(text):
+            return await ctx.send("Successfuly created a new DYK.")
+        return await ctx.send("Something wrong happened internally while attempting to create a DYK entry.")
+
+    @commands.command()
+    @commands.check(BotSettings.is_user_whitelisted)
+    async def dyk_delete(self, ctx, *args):
+        """
+        Deletes an existing 'Did You Know' entry announcement message.
+          - 1st arg: Entry ID
+        """
+        if not len(args):
+            return await ctx.send("You need to specify an entry ID. Use the dyk_list command.")
+        dyk_id = args[0]
+        if BotSettings.DB.delete_dyk(dyk_id):
+            return await ctx.send("Successfuly deleted the DYK.")
+        return await ctx.send("Something wrong happened internally while attempting to delete a DYK entry.")
+
+    @commands.command()
+    @commands.check(BotSettings.is_user_whitelisted)
+    async def dyk_list(self, ctx, *args):
+        """
+        Retrieves all DYKs from the database and DMs it to you.
+        """
+        queue = BotSettings.DB.get_all_dyks()
+        messages_list = list()
+        queue_parsed = str()
+        for msg in queue:
+            queue_str = "ID: {}\t\tText: {}\n".format(msg["id"], msg["text"])
+            if len(queue_parsed + queue_str) >= 1400:
+                messages_list.append(queue_parsed)
+                queue_parsed = str()
+            queue_parsed += queue_str
+        if queue_parsed:
+            messages_list.append(queue_parsed)
+        if not len(messages_list):
+            return await ctx.author.send("The DYK table is empty.")
+        for message in messages_list:
+            await ctx.author.send("DYK table: \n```{}```".format(message))
+
 def setup(bot):
     bot.add_cog(DebugCommands(bot))

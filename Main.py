@@ -22,6 +22,7 @@ async def main_loop():
         if BotSettings.config.process_queue:
             messages = BotSettings.DB.get_messages()
             await BotSettings.bot_actions.process_messages(messages)
+            await BotSettings.bot_actions.process_dyk()
         await asyncio.sleep(BotSettings.config.main_loop_timer)
 
 

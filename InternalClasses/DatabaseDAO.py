@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 import os
+import datetime
+import random
 
 class DatabaseDAO:
     """
@@ -10,20 +12,24 @@ class DatabaseDAO:
     db_connection = None
     users_table = None
     queue_table = None
+    dyk_table = None
+    settings = None
 
-    def __init__(self, db_path, users_table, queue_table):
-        self.db_path = os.path.abspath(db_path)
+    def __init__(self, settings):
+        self.db_path = os.path.abspath(settings.db_path)
         if not os.path.exists( os.path.dirname(self.db_path) ):
             os.makedirs(os.path.dirname(self.db_path))
-        self.users_table = users_table
-        self.queue_table = queue_table
+        self.users_table = settings.users_table
+        self.queue_table = settings.queue_table
+        self.dyk_table = settings.dyk_table
+        self.settings = settings
         self.__setup_connection()
         self.__setup_tables()
 
     def __setup_connection(self):
         conn = None
         try:
-            conn = sqlite3.connect(self.db_path, 10, isolation_level=None)
+            conn = sqlite3.connect(self.db_path, 10, isolation_level=None, detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
         except Error as e:
             print(e)
         conn.row_factory = sqlite3.Row
@@ -61,9 +67,18 @@ class DatabaseDAO:
             );
         """.format(self.queue_table)
 
+        dyk_tbl_sql = """
+            CREATE TABLE IF NOT EXISTS {} (
+                id INTEGER PRIMARY KEY,
+                text TEXT,
+                last_announced timestamp
+            );
+        """.format(self.dyk_table)
+
         # Execute
         self.__create_table(users_tbl_sql)
         self.__create_table(queue_tbl_sql)
+        self.__create_table(dyk_tbl_sql)
 
     def __create_table(self, tbl_sql):
         self.__reconnect()
@@ -219,3 +234,75 @@ class DatabaseDAO:
         finally:
             self.__disconnect()
         return True
+
+    # Did You Know Stuff
+
+    def create_dyk(self, text):
+        self.__reconnect()
+        sql = """INSERT INTO {} (text, last_announced) VALUES(?, ?) """.format(self.dyk_table)
+        cur:sqlite3.Cursor = self.db_connection.cursor()
+        try:
+            cur.execute(sql, ( text, datetime.datetime.min ))
+        except Error as e:
+            print("Error creating dyk to dyk tbl %s - %s"% (sql, e))
+            return False
+        finally:
+            self.__disconnect()
+        return True
+
+    def delete_dyk(self, dyk_id):
+        self.__reconnect()
+        sql = """DELETE FROM {} WHERE id = ? ;""".format(self.dyk_table)
+        cur:sqlite3.Cursor = self.db_connection.cursor()
+        try:
+            cur.execute(sql, ( dyk_id, ))
+        except Error as e:
+            print("Error error deleting DYK %s - %s"% (sql, e))
+            return False
+        finally:
+            self.__disconnect()
+        return True
+
+    def update_dyk_date(self, dyk_id, date:datetime.datetime):
+        self.__reconnect()
+        sql = """UPDATE {} SET last_announced = ? WHERE id = ? ;""".format(self.dyk_table)
+        cur:sqlite3.Cursor = self.db_connection.cursor()
+        try:
+            cur.execute(sql, ( date, dyk_id ))
+        except Error as e:
+            print("Error updating dyk date. id:%s date:%s sql:%s - %s"% (dyk_id, date, sql, e))
+            return False
+        finally:
+            self.__disconnect()
+        return True
+
+    def get_all_dyks(self):
+        self.__reconnect()
+        sql = "SELECT * FROM {};".format(self.dyk_table)
+        cur = self.db_connection.cursor()
+        try:
+            cur.execute(sql)
+            return cur.fetchall()
+        except Error as e:
+            print("Error fetching data from queue tbl %s - %s"% (sql, e))
+            return False
+        finally:
+            self.__disconnect()
+
+    def get_random_dyk(self, now):
+        dyk_query_result = self.get_all_dyks()
+        possible_dyks = list()
+
+        for dyk in dyk_query_result:
+            last_announced = dyk["last_announced"] if dyk["last_announced"] else datetime.datetime.min
+            if (now - last_announced).total_seconds() < 0:
+                continue
+            possible_dyks.append(dyk)
+        if not possible_dyks or not len(possible_dyks):
+            return None
+        rand_dyk = random.choice(possible_dyks)
+        dyk_id = rand_dyk["id"]
+        dyk_text = rand_dyk["text"]
+        next_same_announcement_date = now + datetime.timedelta(seconds= self.settings.dyk_cooldown)
+        self.update_dyk_date(dyk_id, next_same_announcement_date)
+        return dyk_text

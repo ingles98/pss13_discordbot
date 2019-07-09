@@ -35,11 +35,14 @@ class BotConfigurations():
     queue_command_arguments_sep = "[[sep]]"
 
     main_loop_timer = 2  # Seconds
+    dyk_interval = 5 # Seconds. How much time between DYK announcements.
+    dyk_cooldown = 30 # Seconds. How much time to wait for a DYK to be able to reannounce
     command_prefix = "!"
     token = str()
     db_path = str()
     queue_table = str()
     users_table = str()
+    dyk_table = str()
     server_id = 0   # Currently not used
     general_channel_id = 0
     ai_channel_id = 0
@@ -64,11 +67,14 @@ class BotConfigurations():
                 self.db_path = data.pop("db", self.db_path)
                 self.queue_table = data.pop("queueTable", self.queue_table)
                 self.users_table = data.pop("usersTable", self.users_table)
+                self.dyk_table = data.pop("dykTable", self.dyk_table)
                 self.server_id = int(data.pop("serverId", self.server_id))
                 self.general_channel_id = int(data.pop("generalChannelId", self.general_channel_id))
                 self.ai_channel_id = int(data.pop("aiChannelId", self.general_channel_id))
                 self.ahelp_channel_id = int(data.pop("ahelpChannelId", self.general_channel_id))
                 self.whitelist_debug_commands = data.pop("whitelist", self.whitelist_debug_commands)
+                self.dyk_interval = data.pop("dykInterval", self.dyk_interval)
+                self.dyk_cooldown = data.pop("dykCooldown", self.dyk_cooldown)
                 return True
         else:
             print(MESSAGE_CONFIG_NOT_FOUND)
@@ -101,7 +107,7 @@ def setup_bot(bot: Bot):
 
     # Setup database DAO
     global DB
-    DB = DatabaseDAO(config.db_path, config.users_table, config.queue_table)
+    DB = DatabaseDAO(config)
 
     # Setup bot actions class
     global bot_actions

@@ -1,12 +1,15 @@
 import BotSettings
 import asyncio
 import discord
+import datetime
 
 class BotActions:
     """
     This class controls bot actions like sending e-mail notifications and channel broadcasts.
     (To be used by the DatabaseDAO class)
     """
+
+    last_dyk_process = None
 
     COMMAND_MAIL = "MAIL"
     COMMAND_BROADCAST = "BROADCAST"
@@ -40,6 +43,18 @@ class BotActions:
                 print("ERROR - Received a message with an unknown command !")
             print(" -- ")
 
+    async def process_dyk(self) -> None:
+        now = datetime.datetime.now()
+        if not self.last_dyk_process:
+            self.last_dyk_process = now
+        time_diff = (now - self.last_dyk_process)
+        if time_diff.total_seconds() < BotSettings.config.dyk_interval:
+            return
+        self.last_dyk_process = now
+        dyk = BotSettings.DB.get_random_dyk(now)
+        if dyk:
+            await self.send_dyk(None, dyk)
+
     async def send_mail(self, args:list, message_content:str) -> None:
         if not args or not len(args):
             print("ERROR - BotActions.send_mail() need to receive a non-empty list 'args', got {}. This message will be ignored.".format(args))
@@ -69,6 +84,15 @@ class BotActions:
         announce_embed.add_field(name="\u200b", value=message_content, inline=False)
         announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
         await BotSettings.bot_ai_channel_ref.send(embed=announce_embed)
+
+    async def send_dyk(self, args:list, message_content:str):
+        message_content = "...**{}**".format(message_content)
+        announce_embed = discord.Embed(
+            title=u'\U0001f6f0 Did You Know...',
+            color=0x000000)
+        announce_embed.add_field(name="\u200b", value=message_content, inline=False)
+        announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
+        await BotSettings.bot_general_channel_ref.send(embed=announce_embed)
 
     async def send_ahelp(self, args:list, message_content:str):
         ckey, character = args
