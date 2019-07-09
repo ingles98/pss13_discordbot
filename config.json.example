@@ -6,5 +6,6 @@
 	"serverId": "SERVER_ID",
 	"whitelist": [ARRAY, OF, IDS],
 	"generalChannelId": "GENERAL_CHANNEL_ID",
+	"aiChannelId": "AI_BROADCAST_CHANNEL_ID",
 	"ahelpChannelId": "AHELP_CHANNEL_ID"
 }

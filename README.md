@@ -27,8 +27,9 @@ All configuration is handled through config.json. This file is required to run t
     "queueTable":                                         # name of the queue table.
     "usersTable":                                         # name of the users table.
     "serverId":                                           # discord server ID.
-    "generalChannelId":                                   # ID of the channel where the bot sends it's announcements.
-    "ahelpChannelId":                                     # Same as above, but for in-game tickets for the admins.
+    "generalChannelId":                                   # ID of the channel where the bot sends automated "Did You Know" messages, usually the most visited channel.
+    "aiChannelId":                                        # ID of the channel where the bot sends it's announcements.
+    "ahelpChannelId":                                     # Same as above, but for in-game tickets for the admins. Should definately remain private to the staff only.
     "whitelist":                                          # List of server roles or user IDs that may use the debug commands (eg: " "whitelist" : [752381239521385291357, "Admins", "Fake Role"] ")
 }
 ```
