@@ -66,6 +66,8 @@ class BotActions:
             return
 
         formatted_message = message_content.replace("[editorbr]", "\n").replace("[br]", "\n")
+        if len(formatted_message) >= 1000:
+            formatted_message = formatted_message[:950] + "...(Read more in-game)"
         print( discord_user_id, ic_sender, ic_receiver, message_content)
         mail_embed = discord.Embed(
             title=u'\U0001f6f0 Incoming Transmission',
@@ -78,6 +80,8 @@ class BotActions:
         await discord_user.send(embed=mail_embed)
 
     async def send_broadcast(self, args:list, message_content:str):
+        if len(message_content) >= 1000:
+            message_content = message_content[:950] + "...(Limit exceeded)"
         announce_embed = discord.Embed(
             title=u'\U0001f6f0 Incoming Transmission',
             color=0x000000)
@@ -88,6 +92,8 @@ class BotActions:
     async def send_dyk(self, args:list, message_content:str):
         try:
             message_content = "...**{}**".format(message_content)
+            if len(message_content) >= 1000:
+                message_content = message_content[:950] + "...(Limit exceeded)"
             announce_embed = discord.Embed(
                 title=u'\U00002754 Did You Know...',
                 color=0x000000)
@@ -100,6 +106,8 @@ class BotActions:
     async def send_ahelp(self, args:list, message_content:str):
         ckey, character = args
         try:
+            if len(message_content) >= 1000:
+                message_content = message_content[:950] + "...(Limit exceeded)"
             announce_embed = discord.Embed(
                 title=u'\U0001f6f0 NEW IN-GAME TICKET OPEN',
                 color=0x000000)
