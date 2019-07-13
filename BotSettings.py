@@ -34,9 +34,9 @@ class BotConfigurations():
     """
     queue_command_arguments_sep = "[[sep]]"
 
-    main_loop_timer = 2  # Seconds
-    dyk_interval = 60*15 # Seconds. How much time between DYK announcements.
-    dyk_cooldown = 60*120 # Seconds. How much time to wait for a DYK to be able to reannounce
+    main_loop_timer = 5  # Seconds
+    dyk_interval = 60*60 # Seconds. How much time between DYK announcements.
+    dyk_cooldown = 60*180 # Seconds. How much time to wait for a DYK to be able to reannounce
     command_prefix = "!"
     token = str()
     db_path = str()

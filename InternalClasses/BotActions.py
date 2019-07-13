@@ -88,7 +88,7 @@ class BotActions:
     async def send_dyk(self, args:list, message_content:str):
         message_content = "...**{}**".format(message_content)
         announce_embed = discord.Embed(
-            title=u'\U0001f6f0 Did You Know...',
+            title=u'\U00002754 Did You Know...',
             color=0x000000)
         announce_embed.add_field(name="\u200b", value=message_content, inline=False)
         announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
