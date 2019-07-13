@@ -86,20 +86,26 @@ class BotActions:
         await BotSettings.bot_ai_channel_ref.send(embed=announce_embed)
 
     async def send_dyk(self, args:list, message_content:str):
-        message_content = "...**{}**".format(message_content)
-        announce_embed = discord.Embed(
-            title=u'\U00002754 Did You Know...',
-            color=0x000000)
-        announce_embed.add_field(name="\u200b", value=message_content, inline=False)
-        announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
-        await BotSettings.bot_general_channel_ref.send(embed=announce_embed)
+        try:
+            message_content = "...**{}**".format(message_content)
+            announce_embed = discord.Embed(
+                title=u'\U00002754 Did You Know...',
+                color=0x000000)
+            announce_embed.add_field(name="\u200b", value=message_content, inline=False)
+            announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
+            await BotSettings.bot_general_channel_ref.send(embed=announce_embed)
+        except Exception as err:
+            print("FIX DIS! send_dyk() {} -ERR: {}".format(message_content, err))
 
     async def send_ahelp(self, args:list, message_content:str):
         ckey, character = args
-        announce_embed = discord.Embed(
-            title=u'\U0001f6f0 NEW IN-GAME TICKET OPEN',
-            color=0x000000)
-        announce_embed.add_field(name="User key:", value=ckey, inline=True)
-        announce_embed.add_field(name="User character:", value=character, inline=True)
-        announce_embed.add_field(name="\u200b", value=message_content, inline=False)
-        await BotSettings.bot_ahelp_channel_ref.send(embed=announce_embed)
+        try:
+            announce_embed = discord.Embed(
+                title=u'\U0001f6f0 NEW IN-GAME TICKET OPEN',
+                color=0x000000)
+            announce_embed.add_field(name="User key:", value=ckey, inline=True)
+            announce_embed.add_field(name="User character:", value=character, inline=True)
+            announce_embed.add_field(name="\u200b", value=message_content, inline=False)
+            await BotSettings.bot_ahelp_channel_ref.send(embed=announce_embed)
+        except Exception as err:
+            print("FIX DIS! send_ahelp() {} -ERR: {}".format(message_content, err))
