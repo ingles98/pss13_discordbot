@@ -1,5 +1,7 @@
 import asyncio
 import traceback
+import logging
+import discord
 from discord.ext import commands
 import BotSettings
 
@@ -51,6 +53,12 @@ async def on_command_error(ctx, error):
     else:
         print(error)
 
+@bot.event
+async def on_error(event, *args, **kwargs):
+    print("\n### An error as occured.[BOT]\n")
+    message = args[0]
+    logging.warning(traceback.format_exc())
+    await message.context.send("You caused an error!")
 
 @bot.event
 async def on_ready():

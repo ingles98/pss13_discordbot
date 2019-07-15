@@ -80,6 +80,7 @@ class BotActions:
         await discord_user.send(embed=mail_embed)
 
     async def send_broadcast(self, args:list, message_content:str):
+        message_content = message_content if message_content else "`(Empty Message)`"
         if len(message_content) >= 1000:
             message_content = message_content[:950] + "...(Limit exceeded)"
         announce_embed = discord.Embed(
@@ -90,30 +91,33 @@ class BotActions:
         await BotSettings.bot_ai_channel_ref.send(embed=announce_embed)
 
     async def send_dyk(self, args:list, message_content:str):
-        try:
-            message_content = "...**{}**".format(message_content)
-            if len(message_content) >= 1000:
-                message_content = message_content[:950] + "...(Limit exceeded)"
-            announce_embed = discord.Embed(
-                title=u'\U00002754 Did You Know...',
-                color=0x000000)
-            announce_embed.add_field(name="\u200b", value=message_content, inline=False)
-            announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
-            await BotSettings.bot_general_channel_ref.send(embed=announce_embed)
-        except Exception as err:
-            print("FIX DIS! send_dyk() {} -ERR: {}".format(message_content, err))
+        message_content = "...**{}**".format(message_content)
+        if len(message_content) >= 1000:
+            message_content = message_content[:950] + "...(Limit exceeded)"
+            print("WARNING: DYK too large.")
+        announce_embed = discord.Embed(
+            title=u'\U00002754 Did You Know...',
+            color=0x000000)
+        announce_embed.add_field(name="\u200b", value=message_content, inline=False)
+        announce_embed.set_thumbnail(url=str(BotSettings.bot_ref.user.avatar_url))
+        await BotSettings.bot_general_channel_ref.send(embed=announce_embed)
 
     async def send_ahelp(self, args:list, message_content:str):
-        ckey, character = args
-        try:
-            if len(message_content) >= 1000:
-                message_content = message_content[:950] + "...(Limit exceeded)"
-            announce_embed = discord.Embed(
-                title=u'\U0001f6f0 NEW IN-GAME TICKET OPEN',
-                color=0x000000)
-            announce_embed.add_field(name="User key:", value=ckey, inline=True)
-            announce_embed.add_field(name="User character:", value=character, inline=True)
-            announce_embed.add_field(name="\u200b", value=message_content, inline=False)
-            await BotSettings.bot_ahelp_channel_ref.send(embed=announce_embed)
-        except Exception as err:
-            print("FIX DIS! send_ahelp() {} -ERR: {}".format(message_content, err))
+        # Careful formatting checks.. No fields may go empty and that shit happens for some reason
+        unknown_field_value = "`(Unknown)`"
+        ckey, character = unknown_field_value, unknown_field_value
+        if args and len(args):
+            ckey, character = args
+        ckey = ckey if ckey else unknown_field_value
+        character = character if character else unknown_field_value
+        message_content = message_content if message_content else "`(Empty Message)`"
+        if len(message_content) >= 1000:
+            message_content = message_content[:950] + "...(Limit exceeded)"
+
+        announce_embed = discord.Embed(
+            title=u'\U0001f6f0 NEW IN-GAME TICKET OPEN',
+            color=0x000000)
+        announce_embed.add_field(name="User key:", value=ckey, inline=True)
+        announce_embed.add_field(name="User character:", value=character, inline=True)
+        announce_embed.add_field(name="\u200b", value=message_content, inline=False)
+        await BotSettings.bot_ahelp_channel_ref.send(embed=announce_embed)
